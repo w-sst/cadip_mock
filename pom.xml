@@ -2,12 +2,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.7.14</version>
-		<relativePath/> <!-- lookup parent from repository -->
-	</parent>
 	<groupId>de.werum.coprs.cadip</groupId>
 	<artifactId>cadip_mock</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
@@ -15,17 +9,47 @@
 	<description>Mock for Cadip Interface</description>
 	<properties>
 		<java.version>11</java.version>
+		<odata.version>4.8.0</odata.version>
+		<spring.boot.version>2.6.6</spring.boot.version>
 	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
+			<version>${spring.boot.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
+			<version>${spring.boot.version}</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+			<version>${spring.boot.version}</version>
+		</dependency>
+		<dependency>
+		  <groupId>org.apache.olingo</groupId>
+		  <artifactId>odata-commons-api</artifactId>
+		  <version>${odata.version}</version>
+		</dependency>
+		<dependency>
+		  <groupId>org.apache.olingo</groupId>
+		  <artifactId>odata-commons-core</artifactId>
+		  <version>${odata.version}</version>
+		</dependency>
+		<dependency>
+		 <groupId>org.apache.olingo</groupId>
+		 <artifactId>odata-server-api</artifactId>
+		 <version>${odata.version}</version>
+		 <scope>compile</scope>
+		</dependency>
+		<dependency>
+		 <groupId>org.apache.olingo</groupId>
+		 <artifactId>odata-server-core</artifactId>
+		 <version>${odata.version}</version>
+		 <scope>runtime</scope>
 		</dependency>
 	</dependencies>
 
