@@ -30,8 +30,12 @@ public class EdmProvider extends CsdlAbstractEdmProvider{
     public static final String ET_SESSION_NAME = "Session";
     public static final FullQualifiedName ET_SESSION_FQN = new FullQualifiedName(NAMESPACE, ET_SESSION_NAME);
 
+    public static final String ET_FILE_NAME = "File";
+    public static final FullQualifiedName ET_FILE_FQN = new FullQualifiedName(NAMESPACE, ET_FILE_NAME);
+    
     // Entity Set Names
     public static final String ES_SESSIONS_NAME = "Sessions";
+    public static final String ES_FILES_NAME = "Files";
 	
 	@Override
 	public CsdlEntityType getEntityType(FullQualifiedName entityTypeName) throws ODataException {
@@ -89,6 +93,40 @@ public class EdmProvider extends CsdlAbstractEdmProvider{
 	        
 	        entityType.setKey(Collections.singletonList(propertyRef));
 	        return entityType;
+		} else if (entityTypeName.equals(ET_FILE_FQN)) {
+			CsdlProperty id = new CsdlProperty().setName("Id").setType(EdmPrimitiveTypeKind.Guid.getFullQualifiedName());
+			CsdlProperty name = new CsdlProperty().setName("Name").setType(EdmPrimitiveTypeKind.String.getFullQualifiedName());
+			CsdlProperty sessionId = new CsdlProperty().setName("SessionId").setType(EdmPrimitiveTypeKind.String.getFullQualifiedName());
+			CsdlProperty channel = new CsdlProperty().setName("Channel").setType(EdmPrimitiveTypeKind.Int64.getFullQualifiedName());
+			CsdlProperty blockNumber = new CsdlProperty().setName("BlockNumber").setType(EdmPrimitiveTypeKind.Int64.getFullQualifiedName());
+			CsdlProperty finalBlock = new CsdlProperty().setName("FinalBlock").setType(EdmPrimitiveTypeKind.Boolean.getFullQualifiedName());
+			CsdlProperty publicationDate = new CsdlProperty().setName("PublicationDate").setType(EdmPrimitiveTypeKind.DateTimeOffset.getFullQualifiedName()).setPrecision(3);
+			CsdlProperty evictionDate = new CsdlProperty().setName("EvictionDate").setType(EdmPrimitiveTypeKind.DateTimeOffset.getFullQualifiedName()).setPrecision(3);
+			CsdlProperty size = new CsdlProperty().setName("Size").setType(EdmPrimitiveTypeKind.Int64.getFullQualifiedName());
+			CsdlProperty retransfer = new CsdlProperty().setName("Retransfer").setType(EdmPrimitiveTypeKind.Boolean.getFullQualifiedName());
+			
+			// create CsdlPropertyRef for Key element
+	        CsdlPropertyRef propertyRef = new CsdlPropertyRef();
+	        propertyRef.setName("Id");
+
+	        // configure EntityType
+	        CsdlEntityType entityType = new CsdlEntityType();
+	        entityType.setName(ET_FILE_NAME);
+	        entityType.setProperties(Arrays.asList(
+	        		id,
+	        		name,
+	        		sessionId,
+	        		channel,
+	        		blockNumber,
+	        		finalBlock,
+	        		publicationDate,
+	        		evictionDate,
+	        		size,
+	        		retransfer
+	        	));
+	        
+	        entityType.setKey(Collections.singletonList(propertyRef));
+	        return entityType;
 		}
 		
 		return null;
@@ -104,6 +142,13 @@ public class EdmProvider extends CsdlAbstractEdmProvider{
 
 	            return entitySet;
 	          }
+	          else if(entitySetName.equals(ES_FILES_NAME)) {
+	        	  CsdlEntitySet entitySet = new CsdlEntitySet();
+		          entitySet.setName(ES_FILES_NAME);
+		          entitySet.setType(ET_FILE_FQN);
+
+		          return entitySet;
+	          }
 	        }
 
 	        return null;
@@ -115,7 +160,7 @@ public class EdmProvider extends CsdlAbstractEdmProvider{
 	      // create EntitySets
 	      List<CsdlEntitySet> entitySets = new ArrayList<CsdlEntitySet>();
 	      entitySets.add(getEntitySet(CONTAINER, ES_SESSIONS_NAME));
-
+	      entitySets.add(getEntitySet(CONTAINER, ES_FILES_NAME));
 	      // create EntityContainer
 	      CsdlEntityContainer entityContainer = new CsdlEntityContainer();
 	      entityContainer.setName(CONTAINER_NAME);
@@ -146,6 +191,7 @@ public class EdmProvider extends CsdlAbstractEdmProvider{
 	      // add EntityTypes
 	      List<CsdlEntityType> entityTypes = new ArrayList<CsdlEntityType>();
 	      entityTypes.add(getEntityType(ET_SESSION_FQN));
+	      entityTypes.add(getEntityType(ET_FILE_FQN));
 	      schema.setEntityTypes(entityTypes);
 
 	      // add EntityContainer
