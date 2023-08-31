@@ -43,14 +43,12 @@ public class FilterExpressionVisitor implements ExpressionVisitor<Object> {
 			throw new ODataApplicationException("Binary operation " + operator.name() + " is not implemented", 
 		    		  HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(), Locale.ENGLISH);
 		}
-		boolean isIn = false;
 		for(Object rightOperand : right) {
 			if((boolean) visitBinaryOperator(BinaryOperatorKind.EQ, left, rightOperand)) {
-				isIn = true;
-				break;
+				return true;
 			}
 		}
-		return isIn;
+		return false;
 	}
 	
 	@Override
