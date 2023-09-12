@@ -1,29 +1,31 @@
-package de.werum.coprs.cadip.cadip_mock.service.model;
+package de.werum.coprs.cadip.cadip_mock.data.model;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.Objects;
 import java.util.UUID;
 
 public class Session {
+	
 	private UUID id;
 	private String sessionId;
-	private long numChannels;
-	private LocalDateTime publicationDate;
-	private String satellite;
-	private String stationUnitId;
-	private long downlinkOrbit;
-	private String acquisitionId;
-	private String antennaId;
-	private String frontEndId;
-	private boolean retransfer;
-	private boolean antennaStatusOK;
-	private boolean frontEndStatusOK;
+	private long numChannels; // 2
+	private LocalDateTime publicationDate; // now
+	private String satellite; //SessionID 
+	private String stationUnitId;  // Filename 
+	private long downlinkOrbit; //SessionID letzte 6
+	private String acquisitionId; // Statisch
+	private String antennaId;	// Statisch
+	private String frontEndId;	// Statisch
+	private boolean retransfer;	// Statisch false
+	private boolean antennaStatusOK;	// Statisch true
+	private boolean frontEndStatusOK;	// Statisch true
 	private LocalDateTime plannedDataStart;
 	private LocalDateTime plannedDataStop;
-	private LocalDateTime downlinkStart;
-	private LocalDateTime downlinkStop;
-	private boolean downlinkStatusOK;
-	private boolean deliveryPushOK;
+	private LocalDateTime downlinkStart; // Timestamp von SessionID
+	private LocalDateTime downlinkStop;	// Timestamp von SessionID
+	private boolean downlinkStatusOK;	// Statisch true
+	private boolean deliveryPushOK;	// Statisch true
 	
 	public Session(UUID id, String sessionId, long numChannels, LocalDateTime publicationDate, String satellite,
 			String stationUnitId, long downlinkOrbit, String acquisitionId, String antennaId, String frontEndId,
@@ -52,6 +54,17 @@ public class Session {
 		this.deliveryPushOK = deliveryPushOK;
 	}
 
+	@Override
+	public String toString() {
+		return "Session [id=" + id + ", sessionId=" + sessionId + ", numChannels=" + numChannels + ", publicationDate="
+				+ publicationDate + ", satellite=" + satellite + ", stationUnitId=" + stationUnitId + ", downlinkOrbit="
+				+ downlinkOrbit + ", acquisitionId=" + acquisitionId + ", antennaId=" + antennaId + ", frontEndId="
+				+ frontEndId + ", retransfer=" + retransfer + ", antennaStatusOK=" + antennaStatusOK
+				+ ", frontEndStatusOK=" + frontEndStatusOK + ", plannedDataStart=" + plannedDataStart
+				+ ", plannedDataStop=" + plannedDataStop + ", downlinkStart=" + downlinkStart + ", downlinkStop="
+				+ downlinkStop + ", downlinkStatusOK=" + downlinkStatusOK + ", deliveryPushOK=" + deliveryPushOK + "]";
+	}
+	
 	public UUID getId() {
 		return id;
 	}

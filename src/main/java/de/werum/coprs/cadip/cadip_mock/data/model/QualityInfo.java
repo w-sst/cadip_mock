@@ -1,4 +1,4 @@
-package de.werum.coprs.cadip.cadip_mock.service.model;
+package de.werum.coprs.cadip.cadip_mock.data.model;
 
 import java.time.LocalDateTime;
 

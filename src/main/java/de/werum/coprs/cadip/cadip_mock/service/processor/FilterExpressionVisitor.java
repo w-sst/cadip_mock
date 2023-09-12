@@ -247,29 +247,32 @@ public class FilterExpressionVisitor implements ExpressionVisitor<Object> {
 
 	@Override
 	public Object visitMember(Member member) throws ExpressionVisitException, ODataApplicationException {
-	    // To keeps things simple, this tutorial allows only primitive properties.
-	    // We have faith that the java type of Edm.Int32 is Integer
-		
-	    final List<UriResource> uriResourceParts = member.getResourcePath().getUriResourceParts();
+		// To keeps things simple, this tutorial allows only primitive properties.
+		// We have faith that the java type of Edm.Int32 is Integer
 
-	    // Make sure that the resource path of the property contains only a single segment and a
-	    // primitive property has been addressed. We can be sure, that the property exists because  
-	    // the UriParser checks if the property has been defined in service metadata document.
+		final List<UriResource> uriResourceParts = member.getResourcePath().getUriResourceParts();
 
-	    if(uriResourceParts.size() == 1 && uriResourceParts.get(0) instanceof UriResourcePrimitiveProperty) {
-	      UriResourcePrimitiveProperty uriResourceProperty = (UriResourcePrimitiveProperty) uriResourceParts.get(0);
-	      return currentEntity.getProperty(uriResourceProperty.getProperty().getName()).getValue();
-	    } else {
-	      // The OData specification allows in addition complex properties and navigation    
-	      // properties with a target cardinality 0..1 or 1.
-	      // This means any combination can occur e.g. Supplier/Address/City
-	      //  -> Navigation properties  Supplier
-	      //  -> Complex Property       Address
-	      //  -> Primitive Property     City
-	      // For such cases the resource path returns a list of UriResourceParts
-	      throw new ODataApplicationException("Only primitive properties are implemented in filter expressions", 
-	    		  HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(), Locale.ENGLISH);
-	    }
+		// Make sure that the resource path of the property contains only a single
+		// segment and a
+		// primitive property has been addressed. We can be sure, that the property
+		// exists because
+		// the UriParser checks if the property has been defined in service metadata
+		// document.
+
+		if (uriResourceParts.size() == 1 && uriResourceParts.get(0) instanceof UriResourcePrimitiveProperty) {
+			UriResourcePrimitiveProperty uriResourceProperty = (UriResourcePrimitiveProperty) uriResourceParts.get(0);
+			return currentEntity.getProperty(uriResourceProperty.getProperty().getName()).getValue();
+		} else {
+			// The OData specification allows in addition complex properties and navigation
+			// properties with a target cardinality 0..1 or 1.
+			// This means any combination can occur e.g. Supplier/Address/City
+			// -> Navigation properties Supplier
+			// -> Complex Property Address
+			// -> Primitive Property City
+			// For such cases the resource path returns a list of UriResourceParts
+			throw new ODataApplicationException("Only primitive properties are implemented in filter expressions",
+					HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(), Locale.ENGLISH);
+		}
 	}
 
 	@Override

@@ -44,23 +44,23 @@ public class EdmProvider extends CsdlAbstractEdmProvider{
 	        //create EntityType properties
 	        CsdlProperty id = new CsdlProperty().setName("Id").setType(EdmPrimitiveTypeKind.Guid.getFullQualifiedName());
 	        CsdlProperty sessionId = new CsdlProperty().setName("SessionId").setType(EdmPrimitiveTypeKind.String.getFullQualifiedName());
-	        CsdlProperty  numChannels = new CsdlProperty().setName("NumChannels").setType(EdmPrimitiveTypeKind.Int64.getFullQualifiedName());
-	        CsdlProperty  publicationDate = new CsdlProperty().setName("PublicationDate").setType(EdmPrimitiveTypeKind.DateTimeOffset.getFullQualifiedName()).setPrecision(3);
-	        CsdlProperty  satellite = new CsdlProperty().setName("Satellite").setType(EdmPrimitiveTypeKind.String.getFullQualifiedName());
-	        CsdlProperty  stationUnitId = new CsdlProperty().setName("StationUnitId").setType(EdmPrimitiveTypeKind.String.getFullQualifiedName());
-	        CsdlProperty  downlinkOrbit = new CsdlProperty().setName("DownlinkOrbit").setType(EdmPrimitiveTypeKind.Int64.getFullQualifiedName());
-	        CsdlProperty  acquisitionId = new CsdlProperty().setName("AcquisitionId").setType(EdmPrimitiveTypeKind.String.getFullQualifiedName());
-	        CsdlProperty  antennaId = new CsdlProperty().setName("AntennaId").setType(EdmPrimitiveTypeKind.String.getFullQualifiedName());
-	        CsdlProperty  frontEndId = new CsdlProperty().setName("FrontEndId").setType(EdmPrimitiveTypeKind.String.getFullQualifiedName());
-	        CsdlProperty  retransfer = new CsdlProperty().setName("Retransfer").setType(EdmPrimitiveTypeKind.Boolean.getFullQualifiedName());
-	        CsdlProperty  antennaStatusOK = new CsdlProperty().setName("AntennaStatusOK").setType(EdmPrimitiveTypeKind.Boolean.getFullQualifiedName());
-	        CsdlProperty  frontEndStatusOK = new CsdlProperty().setName("FrontEndStatusOK").setType(EdmPrimitiveTypeKind.Boolean.getFullQualifiedName());
-	        CsdlProperty  plannedDataStart = new CsdlProperty().setName("PlannedDataStart").setType(EdmPrimitiveTypeKind.DateTimeOffset.getFullQualifiedName()).setPrecision(6);
-	        CsdlProperty  plannedDataStop = new CsdlProperty().setName("PlannedDataStop").setType(EdmPrimitiveTypeKind.DateTimeOffset.getFullQualifiedName()).setPrecision(6);
-	        CsdlProperty  downlinkStart = new CsdlProperty().setName("DownlinkStart").setType(EdmPrimitiveTypeKind.DateTimeOffset.getFullQualifiedName()).setPrecision(6);
-	        CsdlProperty  downlinkStop = new CsdlProperty().setName("DownlinkStop").setType(EdmPrimitiveTypeKind.DateTimeOffset.getFullQualifiedName()).setPrecision(6);
-	        CsdlProperty  downlinkStatusOK = new CsdlProperty().setName("DownlinkStatusOK").setType(EdmPrimitiveTypeKind.Boolean.getFullQualifiedName());
-	        CsdlProperty  deliveryPushOK = new CsdlProperty().setName("DeliveryPushOK").setType(EdmPrimitiveTypeKind.Boolean.getFullQualifiedName());
+	        CsdlProperty numChannels = new CsdlProperty().setName("NumChannels").setType(EdmPrimitiveTypeKind.Int64.getFullQualifiedName());
+	        CsdlProperty publicationDate = new CsdlProperty().setName("PublicationDate").setType(EdmPrimitiveTypeKind.DateTimeOffset.getFullQualifiedName()).setPrecision(3);
+	        CsdlProperty satellite = new CsdlProperty().setName("Satellite").setType(EdmPrimitiveTypeKind.String.getFullQualifiedName());
+	        CsdlProperty stationUnitId = new CsdlProperty().setName("StationUnitId").setType(EdmPrimitiveTypeKind.String.getFullQualifiedName());
+	        CsdlProperty downlinkOrbit = new CsdlProperty().setName("DownlinkOrbit").setType(EdmPrimitiveTypeKind.Int64.getFullQualifiedName());
+	        CsdlProperty acquisitionId = new CsdlProperty().setName("AcquisitionId").setType(EdmPrimitiveTypeKind.String.getFullQualifiedName());
+	        CsdlProperty antennaId = new CsdlProperty().setName("AntennaId").setType(EdmPrimitiveTypeKind.String.getFullQualifiedName());
+	        CsdlProperty frontEndId = new CsdlProperty().setName("FrontEndId").setType(EdmPrimitiveTypeKind.String.getFullQualifiedName());
+	        CsdlProperty retransfer = new CsdlProperty().setName("Retransfer").setType(EdmPrimitiveTypeKind.Boolean.getFullQualifiedName());
+	        CsdlProperty antennaStatusOK = new CsdlProperty().setName("AntennaStatusOK").setType(EdmPrimitiveTypeKind.Boolean.getFullQualifiedName());
+	        CsdlProperty frontEndStatusOK = new CsdlProperty().setName("FrontEndStatusOK").setType(EdmPrimitiveTypeKind.Boolean.getFullQualifiedName());
+	        CsdlProperty plannedDataStart = new CsdlProperty().setName("PlannedDataStart").setType(EdmPrimitiveTypeKind.DateTimeOffset.getFullQualifiedName()).setPrecision(6);
+	        CsdlProperty plannedDataStop = new CsdlProperty().setName("PlannedDataStop").setType(EdmPrimitiveTypeKind.DateTimeOffset.getFullQualifiedName()).setPrecision(6);
+	        CsdlProperty downlinkStart = new CsdlProperty().setName("DownlinkStart").setType(EdmPrimitiveTypeKind.DateTimeOffset.getFullQualifiedName()).setPrecision(6);
+	        CsdlProperty downlinkStop = new CsdlProperty().setName("DownlinkStop").setType(EdmPrimitiveTypeKind.DateTimeOffset.getFullQualifiedName()).setPrecision(6);
+	        CsdlProperty downlinkStatusOK = new CsdlProperty().setName("DownlinkStatusOK").setType(EdmPrimitiveTypeKind.Boolean.getFullQualifiedName());
+	        CsdlProperty deliveryPushOK = new CsdlProperty().setName("DeliveryPushOK").setType(EdmPrimitiveTypeKind.Boolean.getFullQualifiedName());
 	        
 	        // create CsdlPropertyRef for Key element
 	        CsdlPropertyRef propertyRef = new CsdlPropertyRef();

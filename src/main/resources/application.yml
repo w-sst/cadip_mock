@@ -1,0 +1,11 @@
+cadip:
+  inboxes:
+    '1':
+      path: /path/to/directory
+      retransfer: false
+      stationUnitId: 123stationUnitId321
+      acquisitionId: 54321
+      antennaId: 54322
+      frontEndId: 54323
+  trigger:
+    interval-ms: 100000
