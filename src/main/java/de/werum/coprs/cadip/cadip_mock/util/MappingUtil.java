@@ -9,6 +9,7 @@ import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.Property;
 import org.apache.olingo.commons.api.data.ValueType;
 import org.apache.olingo.commons.api.ex.ODataRuntimeException;
+import org.apache.olingo.commons.api.format.ContentType;
 
 import de.werum.coprs.cadip.cadip_mock.data.model.File;
 import de.werum.coprs.cadip.cadip_mock.data.model.Session;
@@ -27,7 +28,8 @@ public class MappingUtil {
 				.addProperty(new Property(null, "PublicationDate", ValueType.PRIMITIVE, TimeUtil.convertLocalDateTimeToTimestamp(file.getPublicationDate())))
 				.addProperty(new Property(null, "EvictionDate", ValueType.PRIMITIVE, TimeUtil.convertLocalDateTimeToTimestamp(file.getEvictionDate())))   
 				.addProperty(new Property(null, "Size", ValueType.PRIMITIVE, file.getSize()))                                                                                       
-				.addProperty(new Property(null, "Retransfer", ValueType.PRIMITIVE, file.isRetransfer()));                                                                               
+				.addProperty(new Property(null, "Retransfer", ValueType.PRIMITIVE, file.isRetransfer()));
+		fE.setMediaContentType(ContentType.parse("application/octet-stream").toContentTypeString());
 		fE.setId(createId("Files", file.getId()));                                                                                                                                       
 		
 		return fE;

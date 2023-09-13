@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import de.werum.coprs.cadip.cadip_mock.data.Storage;
 import de.werum.coprs.cadip.cadip_mock.service.edm.EdmProvider;
 import de.werum.coprs.cadip.cadip_mock.service.processor.ProductEntityCollectionProcessor;
+import de.werum.coprs.cadip.cadip_mock.service.processor.ProductEntityProcessor;
 
 @RestController
 @RequestMapping(value = "/odata")
@@ -33,6 +34,7 @@ public class OdataController {
 		ServiceMetadata serviceMetadata = oData.createServiceMetadata(edmProvider, new ArrayList<EdmxReference>());
 		ODataHttpHandler handler = oData.createHandler(serviceMetadata);
 		handler.register(new ProductEntityCollectionProcessor(storage));
+		handler.register(new ProductEntityProcessor(storage));
 		
 		handler.process(new HttpServletRequestWrapper(request) {
 	         @Override

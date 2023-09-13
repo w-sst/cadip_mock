@@ -1,11 +1,19 @@
 package de.werum.coprs.cadip.cadip_mock.data;
 
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.EntityCollection;
@@ -29,7 +37,6 @@ public class Storage {
     public Storage() {
         sessionsList = new ArrayList<Session>();
         filesList = new HashMap<>();
-        // initSampleData();
     }
 
     /* PUBLIC FACADE */
@@ -44,7 +51,10 @@ public class Storage {
     }
     
     public EntityCollection readEntitySetData(EdmEntitySet edmEntitySet)throws ODataApplicationException{
-    	String entityName = edmEntitySet.getEntityType().getName();
+    	return readEntitySetData(edmEntitySet.getEntityType().getName());
+    }
+    
+    public EntityCollection readEntitySetData(String entityName)throws ODataApplicationException{
     	switch(entityName) {
     		case EdmProvider.ET_SESSION_NAME:
     			return getSessionsSet();
@@ -84,6 +94,16 @@ public class Storage {
     
     public Set<File> getFileSet(String sessionId) {
     	return filesList.get(sessionId);
+    }
+    
+    public File getFile(String UUID) {
+    	for (Entry<String, Set<File>> t : filesList.entrySet()) {
+    		Optional<File> optFile = t.getValue().stream().filter(o -> o.getId().toString().equals(UUID)).findAny();
+    		if (optFile.isPresent()) {
+    			return optFile.get();
+    		}
+    	};
+    	return null;
     }
     
     /*  INTERNAL */
@@ -136,7 +156,7 @@ public class Storage {
     private Entity getProduct(EdmEntityType edmEntityType, List<UriParameter> keyParams) throws ODataApplicationException{
 
         // the list of entities at runtime
-        EntityCollection entitySet = getProductsSet(edmEntityType.getName());
+        EntityCollection entitySet = readEntitySetData(edmEntityType.getName());
 
         /*  generic approach  to find the requested entity */
         Entity requestedEntity = OlingoUtil.findEntity(edmEntityType, entitySet, keyParams);
@@ -151,117 +171,30 @@ public class Storage {
         return requestedEntity;
      }
 
-     /* HELPER */
-     //private void initSampleData(){
-     //
-    //	 DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.[[SSSSSS][SSS]]'Z'");
-     //    
-     //    final Entity sE1 = new Entity()
-     //       .addProperty(new Property(null, "Id", ValueType.PRIMITIVE, UUID.fromString("00000000-0000-0000-0000-00001")))
-     //       .addProperty(new Property(null, "SessionId", ValueType.PRIMITIVE, "1"))
-     //    	.addProperty(new Property(null, "NumChannels", ValueType.PRIMITIVE, 10L))
-     //    	.addProperty(new Property(null, "PublicationDate", ValueType.PRIMITIVE, TimeUtil.convertStringToTimestamp("2014-01-01T00:00:00.123Z", dateTimeFormatter)))
-     //    	.addProperty(new Property(null, "Satellite", ValueType.PRIMITIVE, "S1A"))
-     //    	.addProperty(new Property(null, "StationUnitId", ValueType.PRIMITIVE, "123"))
-     //    	.addProperty(new Property(null, "DownlinkOrbit", ValueType.PRIMITIVE, 123L))
-     //    	.addProperty(new Property(null, "AcquisitionId", ValueType.PRIMITIVE, "123"))
-     //    	.addProperty(new Property(null, "AntennaId", ValueType.PRIMITIVE, "123"))
-     //    	.addProperty(new Property(null, "FrontEndId", ValueType.PRIMITIVE, "123"))
-     //    	.addProperty(new Property(null, "Retransfer", ValueType.PRIMITIVE, false))
-     //    	.addProperty(new Property(null, "AntennaStatusOK", ValueType.PRIMITIVE, true))
-     //    	.addProperty(new Property(null, "FrontEndStatusOK", ValueType.PRIMITIVE, true))
-     //    	.addProperty(new Property(null, "PlannedDataStart", ValueType.PRIMITIVE, TimeUtil.convertStringToTimestamp("2014-01-01T01:20:00.123Z", dateTimeFormatter)))
-     //    	.addProperty(new Property(null, "PlannedDataStop", ValueType.PRIMITIVE, TimeUtil.convertStringToTimestamp("2014-01-01T01:30:00.001123Z", dateTimeFormatter)))
-     //    	.addProperty(new Property(null, "DownlinkStart", ValueType.PRIMITIVE, TimeUtil.convertStringToTimestamp("2014-01-01T02:10:00.001Z", dateTimeFormatter)))
-     //    	.addProperty(new Property(null, "DownlinkStop", ValueType.PRIMITIVE, TimeUtil.convertStringToTimestamp("2014-01-01T02:21:00.000Z", dateTimeFormatter)))
-     //    	.addProperty(new Property(null, "DownlinkStatusOK", ValueType.PRIMITIVE, true))
-     //    	.addProperty(new Property(null, "DeliveryPushOK", ValueType.PRIMITIVE, true));
-     //    sE1.setId(createId("Sessions", 1));
-     //   sessionsList.add(sE1);
-     //
-     //   final Entity sE2 = new Entity()
-     //		   .addProperty(new Property(null, "Id", ValueType.PRIMITIVE, UUID.fromString("00000000-0000-0000-0000-00002")))
-     //           .addProperty(new Property(null, "SessionId", ValueType.PRIMITIVE, "2"))
-     //        	.addProperty(new Property(null, "NumChannels", ValueType.PRIMITIVE, 20L))
-     //        	.addProperty(new Property(null, "PublicationDate", ValueType.PRIMITIVE, TimeUtil.convertStringToTimestamp("2014-01-02T00:00:00.123Z", dateTimeFormatter)))
-     //        	.addProperty(new Property(null, "Satellite", ValueType.PRIMITIVE, "S2A"))
-     //        	.addProperty(new Property(null, "StationUnitId", ValueType.PRIMITIVE, "234"))
-     //        	.addProperty(new Property(null, "DownlinkOrbit", ValueType.PRIMITIVE, 234L))
-     //        	.addProperty(new Property(null, "AcquisitionId", ValueType.PRIMITIVE, "234"))
-     //        	.addProperty(new Property(null, "AntennaId", ValueType.PRIMITIVE, "234"))
-     //        	.addProperty(new Property(null, "FrontEndId", ValueType.PRIMITIVE, "234"))
-     //        	.addProperty(new Property(null, "Retransfer", ValueType.PRIMITIVE, false))
-     //        	.addProperty(new Property(null, "AntennaStatusOK", ValueType.PRIMITIVE, true))
-     //        	.addProperty(new Property(null, "FrontEndStatusOK", ValueType.PRIMITIVE, true))
-     //        	.addProperty(new Property(null, "PlannedDataStart", ValueType.PRIMITIVE, TimeUtil.convertStringToTimestamp("2014-01-02T01:20:00.000Z", dateTimeFormatter)))
-     //        	.addProperty(new Property(null, "PlannedDataStop", ValueType.PRIMITIVE, TimeUtil.convertStringToTimestamp("2014-01-02T01:30:00.000Z", dateTimeFormatter)))
-     //        	.addProperty(new Property(null, "DownlinkStart", ValueType.PRIMITIVE, TimeUtil.convertStringToTimestamp("2014-01-02T02:10:00.000Z", dateTimeFormatter)))
-     //        	.addProperty(new Property(null, "DownlinkStop", ValueType.PRIMITIVE, TimeUtil.convertStringToTimestamp("2014-01-02T02:21:00.000Z", dateTimeFormatter)))
-     //        	.addProperty(new Property(null, "DownlinkStatusOK", ValueType.PRIMITIVE, true))
-     //        	.addProperty(new Property(null, "DeliveryPushOK", ValueType.PRIMITIVE, true));
-     //   sE2.setId(createId("Sessions", 2));
-     //   sessionsList.add(sE2);
-     //   
-     //   final Entity sE3 = new Entity()
-     //		   .addProperty(new Property(null, "Id", ValueType.PRIMITIVE, UUID.fromString("00000000-0000-0000-0000-00003")))
-     //           .addProperty(new Property(null, "SessionId", ValueType.PRIMITIVE, "3"))
-     //        	.addProperty(new Property(null, "NumChannels", ValueType.PRIMITIVE, 30L))
-     //        	.addProperty(new Property(null, "PublicationDate", ValueType.PRIMITIVE, TimeUtil.convertStringToTimestamp("2014-01-03T00:00:00.123Z", dateTimeFormatter)))
-     //        	.addProperty(new Property(null, "Satellite", ValueType.PRIMITIVE, "S3A"))
-     //        	.addProperty(new Property(null, "StationUnitId", ValueType.PRIMITIVE, "345"))
-     //        	.addProperty(new Property(null, "DownlinkOrbit", ValueType.PRIMITIVE, 345L))
-     //        	.addProperty(new Property(null, "AcquisitionId", ValueType.PRIMITIVE, "345"))
-     //        	.addProperty(new Property(null, "AntennaId", ValueType.PRIMITIVE, "345"))
-     //        	.addProperty(new Property(null, "FrontEndId", ValueType.PRIMITIVE, "345"))
-     //        	.addProperty(new Property(null, "Retransfer", ValueType.PRIMITIVE, false))
-     //        	.addProperty(new Property(null, "AntennaStatusOK", ValueType.PRIMITIVE, true))
-     //        	.addProperty(new Property(null, "FrontEndStatusOK", ValueType.PRIMITIVE, true))
-     //        	.addProperty(new Property(null, "PlannedDataStart", ValueType.PRIMITIVE, TimeUtil.convertStringToTimestamp("2014-01-03T01:20:00.000Z", dateTimeFormatter)))
-     //        	.addProperty(new Property(null, "PlannedDataStop", ValueType.PRIMITIVE, TimeUtil.convertStringToTimestamp("2014-01-03T01:30:00.000Z", dateTimeFormatter)))
-     //        	.addProperty(new Property(null, "DownlinkStart", ValueType.PRIMITIVE, TimeUtil.convertStringToTimestamp("2014-01-03T02:10:00.000Z", dateTimeFormatter)))
-     //        	.addProperty(new Property(null, "DownlinkStop", ValueType.PRIMITIVE, TimeUtil.convertStringToTimestamp("2014-01-03T02:21:00.000Z", dateTimeFormatter)))
-     //        	.addProperty(new Property(null, "DownlinkStatusOK", ValueType.PRIMITIVE, true))
-     //        	.addProperty(new Property(null, "DeliveryPushOK", ValueType.PRIMITIVE, true));
-     //   sE3.setId(createId("Sessions", 3));
-     //   sessionsList.add(sE3);
-     //   
-     //   final Entity fE1 = new Entity()
-     //   		.addProperty(new Property(null, "Id", ValueType.PRIMITIVE, UUID.fromString("00000000-0000-0000-0000-00001")))
-     //   		.addProperty(new Property(null, "Name", ValueType.PRIMITIVE, "blub"))
-     //   		.addProperty(new Property(null, "SessionId", ValueType.PRIMITIVE, "1"))
-     //   		.addProperty(new Property(null, "Channel", ValueType.PRIMITIVE, 1L))
-     //   		.addProperty(new Property(null, "FinalBlock", ValueType.PRIMITIVE, false))
-     //   		.addProperty(new Property(null, "PublicationDate", ValueType.PRIMITIVE, TimeUtil.convertStringToTimestamp("2014-01-03T01:00:00.123Z", dateTimeFormatter)))
-     //   		.addProperty(new Property(null, "EvictionDate", ValueType.PRIMITIVE, TimeUtil.convertStringToTimestamp("2015-01-03T00:00:00.123Z", dateTimeFormatter)))
-     //   		.addProperty(new Property(null, "Size", ValueType.PRIMITIVE, 100L))
-     //   		.addProperty(new Property(null, "Retransfer", ValueType.PRIMITIVE, false));
-     //   fE1.setId(createId("Files", 1));
-     //   filesList.add(fE1);
-     //   
-     //   final Entity fE2 = new Entity()
-     //   		.addProperty(new Property(null, "Id", ValueType.PRIMITIVE, UUID.fromString("00000000-0000-0000-0000-00002")))
-     //   		.addProperty(new Property(null, "Name", ValueType.PRIMITIVE, "blab"))
-     //   		.addProperty(new Property(null, "SessionId", ValueType.PRIMITIVE, "2"))
-     //   		.addProperty(new Property(null, "Channel", ValueType.PRIMITIVE, 2L))
-     //   		.addProperty(new Property(null, "FinalBlock", ValueType.PRIMITIVE, false))
-     //   		.addProperty(new Property(null, "PublicationDate", ValueType.PRIMITIVE, TimeUtil.convertStringToTimestamp("2014-01-03T02:00:00.123Z", dateTimeFormatter)))
-     //   		.addProperty(new Property(null, "EvictionDate", ValueType.PRIMITIVE, TimeUtil.convertStringToTimestamp("2016-01-03T00:00:00.123Z", dateTimeFormatter)))
-     //   		.addProperty(new Property(null, "Size", ValueType.PRIMITIVE, 200L))
-     //   		.addProperty(new Property(null, "Retransfer", ValueType.PRIMITIVE, false));
-     //   fE2.setId(createId("Files", 2));
-     //   filesList.add(fE2);
-     //   
-     //   final Entity fE3 = new Entity()
-     //   		.addProperty(new Property(null, "Id", ValueType.PRIMITIVE, UUID.fromString("00000000-0000-0000-0000-00003")))
-     //   		.addProperty(new Property(null, "Name", ValueType.PRIMITIVE, "blab"))
-     //   		.addProperty(new Property(null, "SessionId", ValueType.PRIMITIVE, "3"))
-     //   		.addProperty(new Property(null, "Channel", ValueType.PRIMITIVE, 3L))
-     //   		.addProperty(new Property(null, "FinalBlock", ValueType.PRIMITIVE, false))
-     //   		.addProperty(new Property(null, "PublicationDate", ValueType.PRIMITIVE, TimeUtil.convertStringToTimestamp("2014-01-03T03:00:00.123Z", dateTimeFormatter)))
-     //   		.addProperty(new Property(null, "EvictionDate", ValueType.PRIMITIVE, TimeUtil.convertStringToTimestamp("2017-01-03T00:00:00.123Z", dateTimeFormatter)))
-     //   		.addProperty(new Property(null, "Size", ValueType.PRIMITIVE, 300L))
-     //   		.addProperty(new Property(null, "Retransfer", ValueType.PRIMITIVE, false));
-     //   fE3.setId(createId("Files", 3));
-     //   filesList.add(fE3);
-    //}
+	public InputStream readMedia(String filePath) throws FileNotFoundException {
+		java.io.File initialFile = new java.io.File(filePath);
+		InputStream fileStream = new FileInputStream(initialFile);
+		
+		return fileStream;
+	}
+	
+	public InputStream readMedia(String filePath, long offset, long length) throws FileNotFoundException {
+		RandomAccessFile randomAccessFile = new RandomAccessFile(filePath, "r");
+		byte[] buffer = new byte[(int) length];
+        try {
+			randomAccessFile.seek(offset);
+			randomAccessFile.readFully(buffer);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			try {
+				randomAccessFile.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}        
+        return new ByteArrayInputStream(buffer);
+	}
 }

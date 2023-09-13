@@ -126,6 +126,8 @@ public class EdmProvider extends CsdlAbstractEdmProvider{
 	        	));
 	        
 	        entityType.setKey(Collections.singletonList(propertyRef));
+	        entityType.setHasStream(true);
+	        
 	        return entityType;
 		}
 		
