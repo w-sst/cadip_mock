@@ -1,7 +1,5 @@
 package de.werum.coprs.cadip.cadip_mock.config;
 
-import java.time.LocalDateTime;
-
 public class InboxConfiguration {
 	
 	private String path;

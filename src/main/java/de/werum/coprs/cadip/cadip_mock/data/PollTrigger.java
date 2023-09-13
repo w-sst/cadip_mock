@@ -1,10 +1,6 @@
 package de.werum.coprs.cadip.cadip_mock.data;
 
 import java.io.IOException;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 

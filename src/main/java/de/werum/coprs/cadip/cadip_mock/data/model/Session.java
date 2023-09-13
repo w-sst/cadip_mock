@@ -1,8 +1,6 @@
 package de.werum.coprs.cadip.cadip_mock.data.model;
 
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.Objects;
 import java.util.UUID;
 
 public class Session {

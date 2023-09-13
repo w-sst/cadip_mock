@@ -2,7 +2,6 @@ package de.werum.coprs.cadip.cadip_mock.util;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import org.apache.olingo.commons.api.data.Entity;
