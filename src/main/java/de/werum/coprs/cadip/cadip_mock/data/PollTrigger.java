@@ -20,8 +20,12 @@ public class PollTrigger {
 		// LocalDateTime t = LocalDateTime.now();
 		for(InboxConfiguration config : properties.getInboxes().values()) {
 			System.out.println("Inbox: " + config.getPath());
-			new PollRun(config, storage).run();
-			
+			try {
+				new PollRun(config, storage).run();
+			} catch (Exception e) {
+				System.out.println("Poll failed for Inbox " + config.getPath());
+				System.out.println(e);
+			}
 		}
 		storage.printAll();
 		// LocalDateTime t2 = LocalDateTime.now();

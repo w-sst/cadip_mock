@@ -89,7 +89,7 @@ public class ProductEntityCollectionProcessor implements EntityCollectionProcess
 		     	      entityIterator.remove();
 		             }
 		          } else {
-		              throw new ODataApplicationException("A filter expression must evaulate to type Edm.Boolean", HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ENGLISH);
+		              throw new ODataApplicationException("A filter expression must evaluate to type Edm.Boolean", HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ENGLISH);
 		          }
 		       } // End while
 		     } catch (ExpressionVisitException e) {

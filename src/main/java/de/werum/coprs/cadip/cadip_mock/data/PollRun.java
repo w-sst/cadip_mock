@@ -41,7 +41,15 @@ public class PollRun {
 	public void run() throws IOException {
 
 		Path path = Paths.get(config.getPath());
-		Stream<Path> list = Files.list(path);
+		Stream<Path> list;
+		try {
+			list = Files.list(path);
+		} catch (IOException e) {
+			System.out.println(e);
+			return;
+		}
+		
+		
 		try {
 			list.forEach(entryPath -> {
 				Matcher sessionMatcher = pattern.matcher(entryPath.getFileName().toString());

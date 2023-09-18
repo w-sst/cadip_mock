@@ -206,7 +206,28 @@ public class FilterExpressionVisitor implements ExpressionVisitor<Object> {
 	        throw new ODataApplicationException("Contains needs two parametes of type Edm.String",
 	            HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ENGLISH);
 	      }
-	    } else {
+	    } else if(methodCall == MethodKind.STARTSWITH) {
+	    	if(parameters.get(0) instanceof String && parameters.get(1) instanceof String) {
+		      String valueParam1 = (String) parameters.get(0);
+		      String valueParam2 = (String) parameters.get(1);
+
+		      return valueParam1.startsWith(valueParam2);
+		    } else {
+		      throw new ODataApplicationException("StartsWith needs two parametes of type Edm.String",
+		          HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ENGLISH);
+		    }
+	    } else if (methodCall == MethodKind.ENDSWITH) { 
+	    	if(parameters.get(0) instanceof String && parameters.get(1) instanceof String) {
+			      String valueParam1 = (String) parameters.get(0);
+			      String valueParam2 = (String) parameters.get(1);
+
+			      return valueParam1.endsWith(valueParam2);
+			    } else {
+			      throw new ODataApplicationException("EndsWith needs two parametes of type Edm.String",
+			          HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ENGLISH);
+			    }
+	    	
+		}else {
 	      throw new ODataApplicationException("Method call " + methodCall + " not implemented",
 	          HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(), Locale.ENGLISH);
 	    }
@@ -221,18 +242,15 @@ public class FilterExpressionVisitor implements ExpressionVisitor<Object> {
 	     // String literals start and end with an single quotation mark
 	    String literalAsString = literal.getText();
 	    if(literal.getType() instanceof EdmString) {
-	    	System.out.println("string");
 	        String stringLiteral = "";
 	        if(literal.getText().length() > 2) {
 	            stringLiteral = literalAsString.substring(1, literalAsString.length() - 1);
 	        }
 	        return stringLiteral;
 	    } else if(literal.getType() instanceof EdmDateTimeOffset) {
-	    	System.out.println(literalAsString);
-	    	DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-	    	return TimeUtil.convertStringToTimestamp(literalAsString, dateTimeFormatter);
+	    	return TimeUtil.convertStringToTimestamp(literalAsString);
 	    } else {
-	        // Try to convert the literal into an Java Integer
+	        // Try to convert the literal into an Java Long
 	        try {
 	            return Long.parseLong(literalAsString);
 	        } catch(NumberFormatException e) {

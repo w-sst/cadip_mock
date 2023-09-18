@@ -35,9 +35,7 @@ public class MappingUtil {
 	}
 	
 	public static Entity mapSessionToEntity(Session session) {
-		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.[[SSSSSS][SSS]]'Z'");
 		// TimeUtil.convertStringToTimestamp("2014-01-01T00:00:00.123Z", dateTimeFormatter)
-		
 		// TimeUtil.convertLocalDateTimeToTimestamp(LocalDateTime.parse(session.getPublicationDate().format(dateTimeFormatter), dateTimeFormatter))))
 		
 		final Entity sE = new Entity()                                                                                                                               

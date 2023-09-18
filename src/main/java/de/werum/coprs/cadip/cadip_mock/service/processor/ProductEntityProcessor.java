@@ -85,7 +85,6 @@ public class ProductEntityProcessor implements EntityProcessor, MediaEntityProce
 			ContentType responseFormat) throws ODataApplicationException, ODataLibraryException {
 		// Since our scenario do not contain navigations from media entities. We can
 		// keep things simple and check only the first resource path of the URI.
-		LocalDateTime t1 = LocalDateTime.now();
 		final UriResource firstResoucePart = uriInfo.getUriResourceParts().get(0);
 		
 		final EdmEntitySet edmEntitySet = OlingoUtil.getEdmEntitySet(uriInfo);
@@ -100,7 +99,7 @@ public class ProductEntityProcessor implements EntityProcessor, MediaEntityProce
 						Locale.ENGLISH);
 			}
 
-			InputStream fileStream = null;
+			InputStream fileStream;
 			try {
 				String rangeContent = request.getHeader("Range");
 				if (rangeContent != null) {
@@ -110,8 +109,8 @@ public class ProductEntityProcessor implements EntityProcessor, MediaEntityProce
 						String f = rangeContent.substring(start + 1, mid);
 						long from = Long.parseLong(f);
 						String t = rangeContent.substring(mid + 1, rangeContent.length());
-						long to = Long.parseLong(t) - from + 1;
-						fileStream = storage.readMedia(file.getFilePath(), from, to);
+						long length = Long.parseLong(t) - from + 1;
+						fileStream = storage.readMedia(file.getFilePath(), from, length);
 					} catch (NumberFormatException | IndexOutOfBoundsException | NegativeArraySizeException e) {
 						e.printStackTrace();
 						throw new ODataApplicationException("Bad request", HttpStatusCode.BAD_REQUEST.getStatusCode(),
@@ -124,9 +123,6 @@ public class ProductEntityProcessor implements EntityProcessor, MediaEntityProce
 				throw new ODataApplicationException("File not found", HttpStatusCode.NOT_FOUND.getStatusCode(),
 						Locale.ENGLISH);
 			}
-			
-			LocalDateTime t2 = LocalDateTime.now();
-			System.out.println(t1 + " != " + t2);
 			
 			response.setStatusCode(HttpStatusCode.OK.getStatusCode());
 			response.setContent(fileStream);

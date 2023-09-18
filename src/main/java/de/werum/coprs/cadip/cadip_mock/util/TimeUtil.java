@@ -7,7 +7,19 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 public class TimeUtil {
+	
+	static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss[.[SSSSSS][SSS][S]]'Z'");
+	
     public static Timestamp convertStringToTimestamp(String dateString, DateTimeFormatter dateTimeFormatter) {
+		return convertLocalDateTimeToTimestamp(LocalDateTime.parse(dateString, dateTimeFormatter));
+	}
+    
+    /**
+     * 
+     * @param dateString in format yyyy-MM-dd'T'HH:mm:ss.[[SSSSSS][SSS]]'Z'
+     * @return a Timestamp Olingo is able to return as DateTimeOffset
+     */
+    public static Timestamp convertStringToTimestamp(String dateString) {
 		return convertLocalDateTimeToTimestamp(LocalDateTime.parse(dateString, dateTimeFormatter));
 	}
     
