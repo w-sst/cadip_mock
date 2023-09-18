@@ -9,3 +9,5 @@ cadip:
       frontEndId: 54323
   trigger:
     interval-ms: 100000
+
+logging.level.de.werum.coprs.cadip.cadip_mock: DEBUG

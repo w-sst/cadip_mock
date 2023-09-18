@@ -1,10 +1,11 @@
 package de.werum.coprs.cadip.cadip_mock.service.processor;
 
 import java.sql.Timestamp;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.edm.EdmEnumType;
 import org.apache.olingo.commons.api.edm.EdmType;
@@ -27,6 +28,7 @@ import de.werum.coprs.cadip.cadip_mock.util.TimeUtil;
 
 public class FilterExpressionVisitor implements ExpressionVisitor<Object> {
 
+	private static final Logger LOG = LogManager.getLogger(FilterExpressionVisitor.class);
 	private Entity currentEntity;
 
 	public FilterExpressionVisitor(Entity currentEntity) {
@@ -106,7 +108,7 @@ public class FilterExpressionVisitor implements ExpressionVisitor<Object> {
 
 	    // All types in our tutorial supports all logical operations, but we have to make sure that   
 	    // the types are equal
-		System.out.println("left:"+ left.getClass() + "  right: " + right.getClass());
+		LOG.trace("Comparing Entity left:"+ left.getClass() + "  " + left.toString() + " - right: " + right.getClass() + "  " + right.toString());
 	    if(left.getClass().equals(right.getClass())) {
 	      // Luckily all used types String, Boolean and also Integer support the interface
 	      // Comparable

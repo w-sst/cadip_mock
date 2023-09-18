@@ -15,6 +15,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.EntityCollection;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
@@ -31,6 +34,7 @@ import de.werum.coprs.cadip.cadip_mock.util.OlingoUtil;
 
 public class Storage {
 
+	private static final Logger LOG = LogManager.getLogger(Storage.class);
     private List<Session> sessionsList;
     private Map<String, Set<File>> filesList;
     
@@ -41,13 +45,16 @@ public class Storage {
 
     /* PUBLIC FACADE */
 
-    public void printAll() {
-    	
-    	sessionsList.forEach(o -> System.out.println(o.toString()));
+    public String toString() {
+    	StringBuilder builder = new StringBuilder();
+    	builder.append(sessionsList.size() + " Sessions:\n");
+    	sessionsList.forEach(o -> builder.append("\t"+o.toString()+"\n"));
     	filesList.forEach((s, l) -> {
-    		System.out.println(l.size()+ " Files for " + s);
-    		l.forEach(o -> System.out.println("\t"+o.toString()));
+    		builder.append(l.size()+ " Files for " + s + ":\n");
+    		l.forEach(o -> builder.append("\t"+o.toString()+"\n"));
     	});
+    	
+    	return builder.toString();
     }
     
     public EntityCollection readEntitySetData(EdmEntitySet edmEntitySet)throws ODataApplicationException{
@@ -185,14 +192,12 @@ public class Storage {
 			randomAccessFile.seek(offset);
 			randomAccessFile.readFully(buffer);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Error reading " + filePath + " and writing partially into buffer", e);
 		} finally {
 			try {
 				randomAccessFile.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.error(e);
 			}
 		}        
         return new ByteArrayInputStream(buffer);

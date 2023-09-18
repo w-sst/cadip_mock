@@ -18,12 +18,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import de.werum.coprs.cadip.cadip_mock.config.InboxConfiguration;
 import de.werum.coprs.cadip.cadip_mock.data.model.File;
 import de.werum.coprs.cadip.cadip_mock.data.model.Session;
 
 public class PollRun {
 
+	private static final Logger LOG = LogManager.getLogger(PollRun.class);
 	private Pattern pattern;
 	DateTimeFormatter dateTimeFormatter;
 	private InboxConfiguration config;
@@ -56,8 +60,7 @@ public class PollRun {
 				if (sessionMatcher.find()) {
 					processSession(entryPath, sessionMatcher);
 				} else {
-					// TODO logger
-					System.out.println("directory not in pattern: " + entryPath.getFileName());
+					LOG.trace("directory not in pattern: " + entryPath.getFileName());
 				}
 			});
 		} finally {
@@ -66,7 +69,7 @@ public class PollRun {
 	}
 
 	private void processSession(Path sessionPath, Matcher sessionMatcher) {
-		// System.out.println("Processing: " + sessionPath.getFileName().toString());
+		LOG.trace("Processing Session " + sessionPath.getFileName().toString());
 		if (!storage.hasSession(sessionPath.getFileName().toString())) {
 			createSession(sessionPath, sessionMatcher);
 		}
@@ -90,8 +93,7 @@ public class PollRun {
 				setFinalFileOfChannel(files, i);
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error(e);
 		}
 	}
 	
@@ -120,7 +122,7 @@ public class PollRun {
 	// }
 	
 	private void createSession(Path sessionPath, Matcher sessionMatcher) {
-		// System.out.println("creating Session: " + sessionPath.getFileName());
+		LOG.trace("creating Session: " + sessionPath.getFileName());
 		storage.createFileSet(sessionPath.getFileName().toString());
 		LocalDateTime start = LocalDateTime.parse(sessionMatcher.group(3), dateTimeFormatter);
 		LocalDateTime stop = start.plusMinutes(16).plusSeconds(23);
@@ -186,7 +188,7 @@ public class PollRun {
 
 		@Override
 		public FileVisitResult visitFileFailed(Path file, IOException exc) {
-			System.err.println(exc);
+			LOG.error(exc);
 			return FileVisitResult.CONTINUE;
 		}
 	}
