@@ -7,11 +7,16 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>cadip_mock</name>
 	<description>Mock for Cadip Interface</description>
+	<packaging>jar</packaging>
+	
 	<properties>
 		<java.version>11</java.version>
 		<odata.version>4.8.0</odata.version>
 		<spring.boot.version>2.6.6</spring.boot.version>
+		<maven.compiler.target>${java.version}</maven.compiler.target>
+    	<maven.compiler.source>${java.version}</maven.compiler.source>
 	</properties>
+	
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -69,6 +74,7 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>2.6.6</version>
 			</plugin>
 		</plugins>
 	</build>
