@@ -49,7 +49,7 @@ public class PollRun {
 		try {
 			list = Files.list(path);
 		} catch (IOException e) {
-			System.out.println(e);
+			LOG.error("Error reading out fileSystem", e);
 			return;
 		}
 		
