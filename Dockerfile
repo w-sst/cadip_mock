@@ -1,8 +1,8 @@
-FROM ubuntu:22.04
+FROM ubuntu:focal-20211006
 
-ARG proxy
-ENV http_proxy $proxy
-ENV https_proxy $proxy
+#ARG proxy
+#ENV http_proxy $proxy
+#ENV https_proxy $proxy
 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get -y install default-jre-headless && \
