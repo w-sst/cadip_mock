@@ -1,13 +1,14 @@
 cadip:
   inboxes:
     '1':
-      path: /path/to/directory
+      path: /data
       retransfer: false
       stationUnitId: 123stationUnitId321
       acquisitionId: 54321
       antennaId: 54322
       frontEndId: 54323
   trigger:
-    interval-ms: 100000
+    interval-ms: 120000
 
 logging.level.de.werum.coprs.cadip.cadip_mock: DEBUG
+server.address: 0.0.0.0
