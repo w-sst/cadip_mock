@@ -13,4 +13,6 @@ WORKDIR /app
 COPY target/cadip_mock*.jar .
 COPY start.sh .
 
+RUN mkdir /data
+
 ENTRYPOINT ["/app/start.sh"]
