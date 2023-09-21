@@ -2,7 +2,7 @@
 image:
   registry: ghcr.io
   repository: w-fsi
-  name: mock_cadip
+  name: cadip_mock
   tag: latest
   imagePullSecrets: ghcr-w-fsi
 
