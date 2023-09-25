@@ -31,19 +31,19 @@ import org.apache.olingo.server.api.uri.queryoption.expression.ExpressionVisitEx
 
 import de.werum.coprs.cadip.cadip_mock.data.Storage;
 
-public class ProductEntityCollectionProcessor implements EntityCollectionProcessor{
+public class ProductEntityCollectionProcessor implements EntityCollectionProcessor {
 
 	private OData odata;
 	private ServiceMetadata serviceMetadata;
 	private Storage storage;
-	
+
 	public ProductEntityCollectionProcessor(Storage storage) {
 		this.storage = storage;
 	}
-	
+
 	public void init(OData odata, ServiceMetadata serviceMetadata) {
-	      this.odata = odata;
-	      this.serviceMetadata = serviceMetadata;
+		this.odata = odata;
+		this.serviceMetadata = serviceMetadata;
 	}
 
 	@Override
@@ -57,48 +57,51 @@ public class ProductEntityCollectionProcessor implements EntityCollectionProcess
 																									// first segment is
 																									// the EntitySet
 		EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
-		
+
 		// 2nd: fetch the data from backend for this requested EntitySetName
 		// it has to be delivered as EntitySet object
 		EntityCollection entitySet = storage.readEntitySetData(edmEntitySet);
-		
-		//Options wie Orderby, oder diese ins getData auslagern
+
+		// Options wie Orderby, oder diese ins getData auslagern
 		FilterOption filterOption = uriInfo.getFilterOption();
-		if(filterOption != null) {
+		if (filterOption != null) {
 			Expression filterExpression = filterOption.getExpression();
-		    try {
-		        List<Entity> entityList = entitySet.getEntities();
-		        Iterator<Entity> entityIterator = entityList.iterator();
+			try {
+				List<Entity> entityList = entitySet.getEntities();
+				Iterator<Entity> entityIterator = entityList.iterator();
 
-		        // Evaluate the expression for each entity
-		        // If the expression is evaluated to "true", keep the entity otherwise remove it from
-		        // the entityList
-		        while (entityIterator.hasNext()) {
-		          // To evaluate the the expression, create an instance of the Filter Expression
-		          // Visitor and pass the current entity to the constructor
-		          Entity currentEntity = entityIterator.next();
-		          FilterExpressionVisitor expressionVisitor = new FilterExpressionVisitor(currentEntity);
+				// Evaluate the expression for each entity
+				// If the expression is evaluated to "true", keep the entity otherwise remove it
+				// from
+				// the entityList
+				while (entityIterator.hasNext()) {
+					// To evaluate the the expression, create an instance of the Filter Expression
+					// Visitor and pass the current entity to the constructor
+					Entity currentEntity = entityIterator.next();
+					FilterExpressionVisitor expressionVisitor = new FilterExpressionVisitor(currentEntity);
 
-		          // Evaluating the expression
-		          Object visitorResult = filterExpression.accept(expressionVisitor);
-		          // The result of the filter expression must be of type Edm.Boolean
-		          if(visitorResult instanceof Boolean) {
-		             if(!Boolean.TRUE.equals(visitorResult)) {
-		               // The expression evaluated to false (or null), so we have to remove the
-		               // currentEntity from entityList
-		     	      entityIterator.remove();
-		             }
-		          } else {
-		              throw new ODataApplicationException("A filter expression must evaluate to type Edm.Boolean", HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ENGLISH);
-		          }
-		       } // End while
-		     } catch (ExpressionVisitException e) {
-		        throw new ODataApplicationException("Exception in filter evaluation",
-		                      HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(), Locale.ENGLISH);
-		     }
+					// Evaluating the expression
+					Object visitorResult = filterExpression.accept(expressionVisitor);
+					// The result of the filter expression must be of type Edm.Boolean
+					if (visitorResult instanceof Boolean) {
+						if (!Boolean.TRUE.equals(visitorResult)) {
+							// The expression evaluated to false (or null), so we have to remove the
+							// currentEntity from entityList
+							entityIterator.remove();
+						}
+					} else {
+						throw new ODataApplicationException("A filter expression must evaluate to type Edm.Boolean",
+								HttpStatusCode.BAD_REQUEST.getStatusCode(),
+								Locale.ENGLISH);
+					}
+				} // End while
+			} catch (ExpressionVisitException e) {
+				throw new ODataApplicationException("Exception in filter evaluation",
+						HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
+						Locale.ENGLISH);
+			}
 		}
-		
-		
+
 		// 3rd: create a serializer based on the requested format (json)
 		ODataSerializer serializer = odata.createSerializer(responseFormat);
 

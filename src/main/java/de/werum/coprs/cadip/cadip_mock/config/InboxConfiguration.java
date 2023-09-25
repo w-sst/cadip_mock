@@ -1,7 +1,7 @@
 package de.werum.coprs.cadip.cadip_mock.config;
 
 public class InboxConfiguration {
-	
+
 	private String path;
 	private boolean retransfer = false;
 
@@ -13,8 +13,8 @@ public class InboxConfiguration {
 	private boolean antennaStatusOK = true;
 	private boolean frontEndStatusOK = true;
 	private boolean downlinkStatusOK = true;
-	private boolean deliveryPushOK = true;	
-	
+	private boolean deliveryPushOK = true;
+
 	public String getPath() {
 		return path;
 	}
@@ -30,7 +30,7 @@ public class InboxConfiguration {
 	public void setRetransfer(boolean retransfer) {
 		this.retransfer = retransfer;
 	}
-	
+
 	public long getNumChannels() {
 		return numChannels;
 	}

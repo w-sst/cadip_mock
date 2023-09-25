@@ -16,12 +16,12 @@ public class OlingoConfig {
 	EdmProvider getEdmProvider() {
 		return new EdmProvider();
 	}
-	
+
 	@Bean
 	Storage getStorage() {
 		return new Storage();
 	}
-	
+
 	@Bean
 	PollTrigger getPollTrigger() {
 		return new PollTrigger();

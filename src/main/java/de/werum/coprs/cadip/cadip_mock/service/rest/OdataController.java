@@ -27,30 +27,30 @@ public class OdataController {
 	private EdmProvider edmProvider;
 	@Autowired
 	private Storage storage;
-	
+
 	@RequestMapping(value = "/v1/**")
-	public void process(HttpServletRequest request, HttpServletResponse response) {		
-		OData oData = OData.newInstance();                                       
+	public void process(HttpServletRequest request, HttpServletResponse response) {
+		OData oData = OData.newInstance();
 		ServiceMetadata serviceMetadata = oData.createServiceMetadata(edmProvider, new ArrayList<EdmxReference>());
 		ODataHttpHandler handler = oData.createHandler(serviceMetadata);
 		handler.register(new ProductEntityCollectionProcessor(storage));
 		handler.register(new ProductEntityProcessor(storage));
-		
+
 		handler.process(new HttpServletRequestWrapper(request) {
-	         @Override
-	         public String getServletPath() {
-	            return "odata/v1"; // just the prefix up to /odata/v1, the rest is used as parameters by Olingo
-	         }
-	         
-	         // /**
-	         //  * @see javax.servlet.http.HttpServletRequestWrapper#getQueryString()
-	         //  */
-	         // @Override
-	         // public String getQueryString() {
-	         //    // normalise query string
-	         //    return handleGeometricRequests(super.getQueryString());
-	         // }
-	      }, response);
+			@Override
+			public String getServletPath() {
+				return "odata/v1"; // just the prefix up to /odata/v1, the rest is used as parameters by Olingo
+			}
+
+			// /**
+			// * @see javax.servlet.http.HttpServletRequestWrapper#getQueryString()
+			// */
+			// @Override
+			// public String getQueryString() {
+			// // normalise query string
+			// return handleGeometricRequests(super.getQueryString());
+			// }
+		}, response);
 	}
-	
+
 }

@@ -42,51 +42,54 @@ public class ProductEntityProcessor implements EntityProcessor, MediaEntityProce
 	public ProductEntityProcessor(Storage storage) {
 		this.storage = storage;
 	}
-	
+
 	@Override
 	public void init(OData odata, ServiceMetadata serviceMetadata) {
 		this.odata = odata;
 		this.serviceMetadata = serviceMetadata;
-		
+
 	}
+
 	@Override
 	public void readEntity(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType responseFormat)
 			throws ODataApplicationException, ODataLibraryException {
-		
-    	// 1. retrieve the Entity Type
-    	List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
-    	// Note: only in our example we can assume that the first segment is the EntitySet
-    	UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
-    	EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
 
-    	// 2. retrieve the data from backend
-    	List<UriParameter> keyPredicates = uriResourceEntitySet.getKeyPredicates();
-    	Entity entity = storage.readEntityData(edmEntitySet, keyPredicates);
+		// 1. retrieve the Entity Type
+		List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
+		// Note: only in our example we can assume that the first segment is the
+		// EntitySet
+		UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
+		EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
 
-    	// 3. serialize
-    	EdmEntityType entityType = edmEntitySet.getEntityType();
+		// 2. retrieve the data from backend
+		List<UriParameter> keyPredicates = uriResourceEntitySet.getKeyPredicates();
+		Entity entity = storage.readEntityData(edmEntitySet, keyPredicates);
 
-    	ContextURL contextUrl = ContextURL.with().entitySet(edmEntitySet).build();
-        // expand and select currently not supported
-    	EntitySerializerOptions options = EntitySerializerOptions.with().contextURL(contextUrl).build();
+		// 3. serialize
+		EdmEntityType entityType = edmEntitySet.getEntityType();
 
-    	ODataSerializer serializer = odata.createSerializer(responseFormat);
-    	SerializerResult serializerResult = serializer.entity(serviceMetadata, entityType, entity, options);
-    	InputStream entityStream = serializerResult.getContent();
+		ContextURL contextUrl = ContextURL.with().entitySet(edmEntitySet).build();
+		// expand and select currently not supported
+		EntitySerializerOptions options = EntitySerializerOptions.with().contextURL(contextUrl).build();
 
-    	//4. configure the response object
-    	response.setContent(entityStream);
-    	response.setStatusCode(HttpStatusCode.OK.getStatusCode());
-    	response.setHeader(HttpHeader.CONTENT_TYPE, responseFormat.toContentTypeString());
-		
+		ODataSerializer serializer = odata.createSerializer(responseFormat);
+		SerializerResult serializerResult = serializer.entity(serviceMetadata, entityType, entity, options);
+		InputStream entityStream = serializerResult.getContent();
+
+		// 4. configure the response object
+		response.setContent(entityStream);
+		response.setStatusCode(HttpStatusCode.OK.getStatusCode());
+		response.setHeader(HttpHeader.CONTENT_TYPE, responseFormat.toContentTypeString());
+
 	}
+
 	@Override
 	public void readMediaEntity(ODataRequest request, ODataResponse response, UriInfo uriInfo,
 			ContentType responseFormat) throws ODataApplicationException, ODataLibraryException {
 		// Since our scenario do not contain navigations from media entities. We can
 		// keep things simple and check only the first resource path of the URI.
 		final UriResource firstResoucePart = uriInfo.getUriResourceParts().get(0);
-		
+
 		final EdmEntitySet edmEntitySet = OlingoUtil.getEdmEntitySet(uriInfo);
 		String entityName = edmEntitySet.getEntityType().getName();
 		if (firstResoucePart instanceof UriResourceEntitySet && entityName.equals(EdmProvider.ET_FILE_NAME)) {
@@ -95,7 +98,8 @@ public class ProductEntityProcessor implements EntityProcessor, MediaEntityProce
 
 			File file = storage.getFile(uriResourceEntitySet.getKeyPredicates().get(0).getText());
 			if (file == null) {
-				throw new ODataApplicationException("File not found", HttpStatusCode.NOT_FOUND.getStatusCode(),
+				throw new ODataApplicationException("File not found",
+						HttpStatusCode.NOT_FOUND.getStatusCode(),
 						Locale.ENGLISH);
 			}
 
@@ -113,23 +117,26 @@ public class ProductEntityProcessor implements EntityProcessor, MediaEntityProce
 						fileStream = storage.readMedia(file.getFilePath(), from, length);
 					} catch (NumberFormatException | IndexOutOfBoundsException | NegativeArraySizeException e) {
 						e.printStackTrace();
-						throw new ODataApplicationException("Bad request", HttpStatusCode.BAD_REQUEST.getStatusCode(),
+						throw new ODataApplicationException("Bad request",
+								HttpStatusCode.BAD_REQUEST.getStatusCode(),
 								Locale.ENGLISH);
 					}
 				} else {
 					fileStream = storage.readMedia(file.getFilePath());
 				}
 			} catch (FileNotFoundException e) {
-				throw new ODataApplicationException("File not found", HttpStatusCode.NOT_FOUND.getStatusCode(),
+				throw new ODataApplicationException("File not found",
+						HttpStatusCode.NOT_FOUND.getStatusCode(),
 						Locale.ENGLISH);
 			}
-			
+
 			response.setStatusCode(HttpStatusCode.OK.getStatusCode());
 			response.setContent(fileStream);
 			response.setHeader(HttpHeader.CONTENT_TYPE, "application/octet-stream");
 			response.setHeader("Content-disposition", "attachment; filename=" + file.getName());
 		} else {
-			throw new ODataApplicationException("Not implemented", HttpStatusCode.BAD_REQUEST.getStatusCode(),
+			throw new ODataApplicationException("Not implemented",
+					HttpStatusCode.BAD_REQUEST.getStatusCode(),
 					Locale.ENGLISH);
 		}
 	}
@@ -138,27 +145,29 @@ public class ProductEntityProcessor implements EntityProcessor, MediaEntityProce
 	public void createEntity(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType requestFormat,
 			ContentType responseFormat) throws ODataApplicationException, ODataLibraryException {
 		// TODO Auto-generated method stub
-		
+
 	}
+
 	@Override
 	public void updateEntity(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType requestFormat,
 			ContentType responseFormat) throws ODataApplicationException, ODataLibraryException {
 		// TODO Auto-generated method stub
-		
+
 	}
+
 	@Override
 	public void deleteEntity(ODataRequest request, ODataResponse response, UriInfo uriInfo)
 			throws ODataApplicationException, ODataLibraryException {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	@Override
 	public void createMediaEntity(ODataRequest request, ODataResponse response, UriInfo uriInfo,
 			ContentType requestFormat, ContentType responseFormat)
 			throws ODataApplicationException, ODataLibraryException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -166,14 +175,14 @@ public class ProductEntityProcessor implements EntityProcessor, MediaEntityProce
 			ContentType requestFormat, ContentType responseFormat)
 			throws ODataApplicationException, ODataLibraryException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void deleteMediaEntity(ODataRequest request, ODataResponse response, UriInfo uriInfo)
 			throws ODataApplicationException, ODataLibraryException {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 }

@@ -32,11 +32,11 @@ public class PollRun {
 	DateTimeFormatter dateTimeFormatter;
 	private InboxConfiguration config;
 	private Storage storage;
-	
+
 	public PollRun(InboxConfiguration config, Storage storage) {
 		// 1=Satellit, 3=LocalDateTime, 4=Acquisition Orbit
 		this.pattern = Pattern.compile("(.+)_((\\d+)(\\d{6}))");
-		
+
 		this.dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 		this.config = config;
 		this.storage = storage;
@@ -52,8 +52,7 @@ public class PollRun {
 			LOG.error("Error reading out fileSystem", e);
 			return;
 		}
-		
-		
+
 		try {
 			list.forEach(entryPath -> {
 				Matcher sessionMatcher = pattern.matcher(entryPath.getFileName().toString());
@@ -76,7 +75,7 @@ public class PollRun {
 		Set<File> files = storage.getFileSet(sessionPath.getFileName().toString());
 		processFilesOfSession(files, sessionPath);
 	}
-	
+
 	private void processFilesOfSession(Set<File> files, Path sessionPath) {
 		PathWalker fileWalker = new PathWalker(files);
 		try {
@@ -86,9 +85,9 @@ public class PollRun {
 					o.setFinalBlock(false);
 				}
 			});
-			
+
 			Files.walkFileTree(sessionPath, fileWalker);
-			
+
 			for (long i = 1L; i <= config.getNumChannels(); i++) {
 				setFinalFileOfChannel(files, i);
 			}
@@ -96,39 +95,37 @@ public class PollRun {
 			LOG.error(e);
 		}
 	}
-	
-	// Filters files after their channel and gets the file obj with the highest BlockNumber and sets their finalBlock=true
+
+	// Filters files after their channel and gets the file obj with the highest
+	// BlockNumber and sets their finalBlock=true
 	private void setFinalFileOfChannel(Set<File> files, long channel) {
-		Optional<File> finalFile = files.stream()
-				.filter(o -> o.getChannel() == channel)
-				.reduce((first, second) -> 
-					first.getBlockNumber() > second.getBlockNumber() ? first : second);
+		Optional<File> finalFile = files.stream().filter(o -> o.getChannel() == channel)
+				.reduce((first, second) -> first.getBlockNumber() > second.getBlockNumber() ? first : second);
 		if (finalFile.isPresent()) {
 			finalFile.get().setFinalBlock(true);
 		}
 	}
-	
+
 	// private void test(Set<File> files) {
-	// 	files.stream()
-	// 	.collect(Collectors.groupingBy(File::getChannel))
-	// 	.entrySet().forEach(o -> {
-	// 		Optional<File> finalFile = o.getValue().stream().reduce((first, second) -> 
-	// 								first.getBlockNumber() > second.getBlockNumber() ? first : second
-	// 							);
-	// 		if (finalFile.isPresent()) {
-	// 			finalFile.get().setFinalBlock(true);
-	// 		}
-	// 	});
+	// files.stream()
+	// .collect(Collectors.groupingBy(File::getChannel))
+	// .entrySet().forEach(o -> {
+	// Optional<File> finalFile = o.getValue().stream().reduce((first, second) ->
+	// first.getBlockNumber() > second.getBlockNumber() ? first : second
+	// );
+	// if (finalFile.isPresent()) {
+	// finalFile.get().setFinalBlock(true);
 	// }
-	
+	// });
+	// }
+
 	private void createSession(Path sessionPath, Matcher sessionMatcher) {
 		LOG.trace("creating Session: " + sessionPath.getFileName());
 		storage.createFileSet(sessionPath.getFileName().toString());
 		LocalDateTime start = LocalDateTime.parse(sessionMatcher.group(3), dateTimeFormatter);
 		LocalDateTime stop = start.plusMinutes(16).plusSeconds(23);
-		
-		Session newSession = new Session(
-				UUID.randomUUID(),
+
+		Session newSession = new Session(UUID.randomUUID(),
 				sessionPath.getFileName().toString(),
 				config.getNumChannels(),
 				LocalDateTime.now(),
@@ -146,16 +143,15 @@ public class PollRun {
 				start,
 				stop,
 				config.isDownlinkStatusOK(),
-				config.isDeliveryPushOK()
-			);
+				config.isDeliveryPushOK());
 		storage.addSessionToList(newSession);
 	}
-	
+
 	private class PathWalker extends SimpleFileVisitor<Path> {
 
 		Pattern pattern;
 		Set<File> files;
-				
+
 		public PathWalker(Set<File> files) {
 			this.pattern = Pattern.compile("DCS_(\\d{2})_(.+_\\d+)_ch(\\d{1})_DSDB_(\\d{5}).raw");
 			this.files = files;
@@ -166,20 +162,18 @@ public class PollRun {
 			if (attr.isRegularFile()) {
 
 				Matcher matcher = pattern.matcher(file.getFileName().toString());
-				if(matcher.find()) {
-					File newFile = new File(
-								file.toString(),
-								UUID.randomUUID(),
-								file.getFileName().toString(),
-								matcher.group(2),
-								Long.parseLong(matcher.group(3)),
-								Long.parseLong(matcher.group(4)), 
-								false,
-								LocalDateTime.ofInstant(attr.lastModifiedTime().toInstant(), ZoneId.systemDefault()),
-								(LocalDateTime) null,
-								attr.size(),
-								config.isRetransfer()
-							);
+				if (matcher.find()) {
+					File newFile = new File(file.toString(),
+							UUID.randomUUID(),
+							file.getFileName().toString(),
+							matcher.group(2),
+							Long.parseLong(matcher.group(3)),
+							Long.parseLong(matcher.group(4)),
+							false,
+							LocalDateTime.ofInstant(attr.lastModifiedTime().toInstant(), ZoneId.systemDefault()),
+							(LocalDateTime) null,
+							attr.size(),
+							config.isRetransfer());
 					files.add(newFile);
 				}
 			}

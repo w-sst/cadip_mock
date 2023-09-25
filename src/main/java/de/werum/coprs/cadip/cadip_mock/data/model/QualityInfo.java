@@ -17,7 +17,7 @@ public class QualityInfo {
 	private LocalDateTime deliveryStop;
 	private long totalChunks;
 	private long totalVolume;
-	
+
 	public QualityInfo(long channel, String sessionId, long acquiredTFs, long errorTFs, long correctedTFs,
 			long uncorrectableTFs, long dataTFs, long errorDataTFs, long correctedDataTFs, long uncorrectableDataTFs,
 			LocalDateTime deliveryStart, LocalDateTime deliveryStop, long totalChunks, long totalVolume) {
@@ -41,42 +41,55 @@ public class QualityInfo {
 	public long getChannel() {
 		return channel;
 	}
+
 	public String getSessionId() {
 		return sessionId;
 	}
+
 	public long getAcquiredTFs() {
 		return acquiredTFs;
 	}
+
 	public long getErrorTFs() {
 		return errorTFs;
 	}
+
 	public long getCorrectedTFs() {
 		return correctedTFs;
 	}
+
 	public long getUncorrectableTFs() {
 		return uncorrectableTFs;
 	}
+
 	public long getDataTFs() {
 		return dataTFs;
 	}
+
 	public long getErrorDataTFs() {
 		return errorDataTFs;
 	}
+
 	public long getCorrectedDataTFs() {
 		return correctedDataTFs;
 	}
+
 	public long getUncorrectableDataTFs() {
 		return uncorrectableDataTFs;
 	}
+
 	public LocalDateTime getDeliveryStart() {
 		return deliveryStart;
 	}
+
 	public LocalDateTime getDeliveryStop() {
 		return deliveryStop;
 	}
+
 	public long getTotalChunks() {
 		return totalChunks;
 	}
+
 	public long getTotalVolume() {
 		return totalVolume;
 	}
