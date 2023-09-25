@@ -170,7 +170,7 @@ public class PollRun {
 							Long.parseLong(matcher.group(3)),
 							Long.parseLong(matcher.group(4)),
 							false,
-							LocalDateTime.ofInstant(attr.lastModifiedTime().toInstant(), ZoneId.systemDefault()),
+							LocalDateTime.now(),
 							(LocalDateTime) null,
 							attr.size(),
 							config.isRetransfer());
