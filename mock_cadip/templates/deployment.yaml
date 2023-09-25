@@ -1,4 +1,4 @@
-kind: Deployment
+kind: StatefulSet
 apiVersion: apps/v1
 metadata:
   name: {{ .Release.Name }}
@@ -13,7 +13,6 @@ spec:
     matchLabels:
       app: {{ .Release.Name }}
   replicas: 1
-  serviceName: {{ .Release.Name }}-svc
   template:
     metadata:
       name: {{ .Release.Name }}
@@ -22,28 +21,39 @@ spec:
         type: {{ .Values.processing.namespace }}
     spec:
       containers:
-      - name: {{ .Release.Name }}
+      - name: {{ .Release.Name }}-webdav
         image: {{ .Values.image.registry }}/{{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}
         imagePullPolicy: Always
-        resources:
-          requests:
-            memory: {{ .Values.resources.requests.memory }}
-            cpu: {{ .Values.resources.requests.cpu }}
-          limits:
-            memory: {{ .Values.resources.limits.memory }}
-            cpu: {{ .Values.resources.limits.cpu }}
         ports:
-        - name: http
-          containerPort: {{ .Values.service.port }}
+        - name: cadip
           protocol: TCP
-#        env:
-#        livenessProbe:
-#          tcpSocket:
-#            port: 21
-#          initialDelaySeconds: 30
-#          periodSeconds: 30
-#          timeoutSeconds: 5
-#        volumeMounts:
-#        -
+          containerPort: 8080   
+        volumeMounts: 
+        - name: cadipdatadir
+          mountPath: /data
+        livenessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 5
+        securityContext:
+          privileged: false      
       imagePullSecrets:
-        - name: {{ .Values.image.imagePullSecrets }}
+      - name: {{ .Values.image.imagePullSecrets }}
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      subdomain: {{ .Release.Name }}-svc
+      securityContext: {}
+      schedulerName: default-scheduler
+  serviceName: {{ .Release.Name }}-svc
+  revisionHistoryLimit: 10
+  volumeClaimTemplates:  
+  - metadata:
+      name: cadipdatadir
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: "30Gi"
