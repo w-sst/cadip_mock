@@ -5,11 +5,10 @@ metadata:
   labels:
     app: {{ .Release.Name }}-svc
 spec:
-  type: {{ .Values.service.type }}
+  type: ClusterIP
   selector:
     app: {{ .Release.Name }}
   ports:
     - port: {{ .Values.service.port }}
-      targetPort: http
       protocol: TCP
       name: http
