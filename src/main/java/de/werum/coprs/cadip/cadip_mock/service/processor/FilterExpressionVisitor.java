@@ -115,11 +115,11 @@ public class FilterExpressionVisitor implements ExpressionVisitor<Object> {
 			// Comparable
 			int result;
 			if (left instanceof Long) {
-				result = ((Comparable<Long>) (Long) left).compareTo((Long) right);
+				result = ((Long) left).compareTo((Long) right);
 			} else if (left instanceof String) {
-				result = ((Comparable<String>) (String) left).compareTo((String) right);
+				result = ((String) left).compareTo((String) right);
 			} else if (left instanceof Boolean) {
-				result = ((Comparable<Boolean>) (Boolean) left).compareTo((Boolean) right);
+				result = ((Boolean) left).compareTo((Boolean) right);
 			} else if (left instanceof Timestamp) {
 				result = ((Timestamp) left).compareTo((Timestamp) right);
 			} else {

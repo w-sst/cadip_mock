@@ -9,7 +9,6 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.Set;
@@ -120,7 +119,7 @@ public class PollRun {
 	// }
 
 	private void createSession(Path sessionPath, Matcher sessionMatcher) {
-		LOG.trace("creating Session: " + sessionPath.getFileName());
+		LOG.trace("creating Session: {}", sessionPath.getFileName());
 		storage.createFileSet(sessionPath.getFileName().toString());
 		LocalDateTime start = LocalDateTime.parse(sessionMatcher.group(3), dateTimeFormatter);
 		LocalDateTime stop = start.plusMinutes(16).plusSeconds(23);
@@ -160,6 +159,8 @@ public class PollRun {
 		@Override
 		public FileVisitResult visitFile(Path file, BasicFileAttributes attr) {
 			if (attr.isRegularFile()) {
+
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
 				Matcher matcher = pattern.matcher(file.getFileName().toString());
 				if (matcher.find()) {
