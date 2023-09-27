@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.olingo.commons.api.data.ContextURL;
 import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
@@ -35,6 +37,8 @@ import de.werum.coprs.cadip.cadip_mock.util.OlingoUtil;
 
 public class ProductEntityProcessor implements EntityProcessor, MediaEntityProcessor {
 
+	private static final Logger LOG = LogManager.getLogger(ProductEntityProcessor.class);
+
 	private OData odata;
 	private ServiceMetadata serviceMetadata;
 	private Storage storage;
@@ -60,6 +64,8 @@ public class ProductEntityProcessor implements EntityProcessor, MediaEntityProce
 		// EntitySet
 		UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
 		EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
+
+		LOG.debug("Request for Entity: {}", request.getRawRequestUri());
 
 		// 2. retrieve the data from backend
 		List<UriParameter> keyPredicates = uriResourceEntitySet.getKeyPredicates();
@@ -102,6 +108,7 @@ public class ProductEntityProcessor implements EntityProcessor, MediaEntityProce
 						HttpStatusCode.NOT_FOUND.getStatusCode(),
 						Locale.ENGLISH);
 			}
+			LOG.debug("Request to download {}: {}", file.getName(), request.getRawRequestUri());
 
 			InputStream fileStream;
 			try {

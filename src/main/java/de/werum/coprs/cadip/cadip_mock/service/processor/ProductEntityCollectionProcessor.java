@@ -7,6 +7,9 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.olingo.commons.api.data.ContextURL;
 import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.EntityCollection;
@@ -46,6 +49,8 @@ import de.werum.coprs.cadip.cadip_mock.data.Storage;
 
 public class ProductEntityCollectionProcessor implements EntityCollectionProcessor {
 
+	private static final Logger LOG = LogManager.getLogger(ProductEntityCollectionProcessor.class);
+
 	private OData odata;
 	private ServiceMetadata serviceMetadata;
 	private Storage storage;
@@ -69,7 +74,7 @@ public class ProductEntityCollectionProcessor implements EntityCollectionProcess
 																									// first segment is
 																									// the EntitySet
 		EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
-
+		LOG.debug("Request for Collection: {}", request.getRawRequestUri());
 		// 2nd: fetch the data from backend for this requested EntitySetName
 		// it has to be delivered as EntitySet object
 		EntityCollection entitySet = storage.readEntitySetData(edmEntitySet);
