@@ -110,8 +110,8 @@ public class FilterExpressionVisitor implements ExpressionVisitor<Object> {
 		// All types in our tutorial supports all logical operations, but we have to
 		// make sure that
 		// the types are equal
-		LOG.trace("Comparing Entity left:" + left.getClass() + "  " + left.toString() + " - right: " + right.getClass()
-				+ "  " + right.toString());
+		LOG.trace("Comparing Entity left: {}: {} - right: {}: {}", left.getClass(), left.toString(), right.getClass(),
+				right.toString());
 		if (left.getClass().equals(right.getClass())) {
 			// Luckily all used types String, Boolean and also Integer support the interface
 			// Comparable

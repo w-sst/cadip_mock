@@ -58,7 +58,7 @@ public class PollRun {
 				if (sessionMatcher.find()) {
 					processSession(entryPath, sessionMatcher);
 				} else {
-					LOG.trace("directory not in pattern: " + entryPath.getFileName());
+					LOG.trace("directory not in pattern: {}", entryPath.getFileName());
 				}
 			});
 		} finally {
@@ -67,7 +67,7 @@ public class PollRun {
 	}
 
 	private void processSession(Path sessionPath, Matcher sessionMatcher) {
-		LOG.trace("Processing Session " + sessionPath.getFileName().toString());
+		LOG.trace("Processing Session {}", sessionPath.getFileName().toString());
 		if (!storage.hasSession(sessionPath.getFileName().toString())) {
 			createSession(sessionPath, sessionMatcher);
 		}
@@ -119,7 +119,7 @@ public class PollRun {
 	// }
 
 	private void createSession(Path sessionPath, Matcher sessionMatcher) {
-		LOG.trace("creating Session: {}", sessionPath.getFileName());
+		
 		storage.createFileSet(sessionPath.getFileName().toString());
 		LocalDateTime start = LocalDateTime.parse(sessionMatcher.group(3), dateTimeFormatter);
 		LocalDateTime stop = start.plusMinutes(16).plusSeconds(23);
@@ -143,6 +143,7 @@ public class PollRun {
 				stop,
 				config.isDownlinkStatusOK(),
 				config.isDeliveryPushOK());
+		LOG.debug("added newSession: {}", newSession);
 		storage.addSessionToList(newSession);
 	}
 
@@ -160,8 +161,6 @@ public class PollRun {
 		public FileVisitResult visitFile(Path file, BasicFileAttributes attr) {
 			if (attr.isRegularFile()) {
 
-				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-
 				Matcher matcher = pattern.matcher(file.getFileName().toString());
 				if (matcher.find()) {
 					File newFile = new File(file.toString(),
@@ -175,6 +174,7 @@ public class PollRun {
 							(LocalDateTime) null,
 							attr.size(),
 							config.isRetransfer());
+					LOG.debug("added newFile: {}", newFile);
 					files.add(newFile);
 				}
 			}

@@ -177,7 +177,7 @@ public class Storage {
 			randomAccessFile.seek(offset);
 			randomAccessFile.readFully(buffer);
 		} catch (IOException e) {
-			LOG.error("Error reading " + filePath + " and writing partially into buffer", e);
+			LOG.error("Error reading {} and writing partially into buffer", filePath, e);
 		} finally {
 			try {
 				randomAccessFile.close();
