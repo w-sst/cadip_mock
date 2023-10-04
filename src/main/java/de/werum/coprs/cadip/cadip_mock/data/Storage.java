@@ -68,7 +68,9 @@ public class Storage {
 		case EdmProvider.ET_FILE_NAME:
 			return getFilesSet();
 		default:
-			return null;
+			throw new ODataApplicationException("EntitySet for requested key doesn't exist",
+					HttpStatusCode.NOT_FOUND.getStatusCode(),
+					Locale.ENGLISH);
 		}
 	}
 
@@ -82,7 +84,9 @@ public class Storage {
 		case EdmProvider.ET_FILE_NAME:
 			return getProduct(edmEntityType, keyParams);
 		default:
-			return null;
+			throw new ODataApplicationException("Entity for requested key doesn't exist",
+					HttpStatusCode.NOT_FOUND.getStatusCode(),
+					Locale.ENGLISH);
 		}
 
 	}
@@ -114,32 +118,6 @@ public class Storage {
 		}
 		;
 		return null;
-	}
-
-	/* INTERNAL */
-
-	private List<Entity> getEntityList(String entityName) throws ODataApplicationException {
-		switch (entityName) {
-		case EdmProvider.ET_SESSION_NAME:
-			return null; // sessionsList;
-		case EdmProvider.ET_FILE_NAME:
-			return null; // filesList;
-		default:
-			throw new ODataApplicationException("Entity for requested key doesn't exist",
-					HttpStatusCode.NOT_FOUND.getStatusCode(),
-					Locale.ENGLISH);
-		}
-	}
-
-	private EntityCollection getProductsSet(String entityName) throws ODataApplicationException {
-		EntityCollection retEntitySet = new EntityCollection();
-		List<Entity> entityList = getEntityList(entityName);
-
-		for (Entity productEntity : entityList) {
-			retEntitySet.getEntities().add(productEntity);
-		}
-
-		return retEntitySet;
 	}
 
 	private EntityCollection getSessionsSet() {
