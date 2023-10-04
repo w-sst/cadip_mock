@@ -3,6 +3,7 @@ package de.werum.coprs.cadip.cadip_mock.service.processor;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,6 +12,7 @@ import org.apache.olingo.commons.api.edm.EdmEnumType;
 import org.apache.olingo.commons.api.edm.EdmType;
 import org.apache.olingo.commons.api.http.HttpStatusCode;
 import org.apache.olingo.commons.core.edm.primitivetype.EdmDateTimeOffset;
+import org.apache.olingo.commons.core.edm.primitivetype.EdmGuid;
 import org.apache.olingo.commons.core.edm.primitivetype.EdmString;
 import org.apache.olingo.server.api.ODataApplicationException;
 import org.apache.olingo.server.api.uri.UriResource;
@@ -122,6 +124,8 @@ public class FilterExpressionVisitor implements ExpressionVisitor<Object> {
 				result = ((Boolean) left).compareTo((Boolean) right);
 			} else if (left instanceof Timestamp) {
 				result = ((Timestamp) left).compareTo((Timestamp) right);
+			} else if (left instanceof UUID) {
+				result = ((UUID) left).compareTo((UUID) right);
 			} else {
 				throw new ODataApplicationException("Class " + left.getClass().getCanonicalName() + " not expected",
 						HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
@@ -263,13 +267,14 @@ public class FilterExpressionVisitor implements ExpressionVisitor<Object> {
 			return stringLiteral;
 		} else if (literal.getType() instanceof EdmDateTimeOffset) {
 			return TimeUtil.convertStringToTimestamp(literalAsString);
+		} else if (literal.getType() instanceof EdmGuid) {
+			return UUID.fromString(literalAsString);
 		} else {
-			// Try to convert the literal into an Java Long
 			try {
 				return Long.parseLong(literalAsString);
 			} catch (NumberFormatException e) {
 				throw new ODataApplicationException(
-						"Only Edm.Int64, Edm.String, Edm.DateTimeOffset literals are implemented",
+						"Only Edm.Int64, Edm.String, Edm.DateTimeOffset, Edm.Guid literals are implemented",
 						HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(),
 						Locale.ENGLISH);
 			}

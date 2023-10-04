@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -222,6 +223,9 @@ public class ProductEntityCollectionProcessor implements EntityCollectionProcess
 				Object right = entity2.getProperty(sortPropertyName).getValue();
 				int result = 0;
 				switch (typeOfProp) {
+				case DateTimeOffset:
+					result = ((Timestamp) left).compareTo((Timestamp) right);
+					break;
 				case Int64:
 					result = (((Long) left).compareTo((Long) right));
 					break;
@@ -231,8 +235,8 @@ public class ProductEntityCollectionProcessor implements EntityCollectionProcess
 				case Boolean:
 					result = ((Boolean) left).compareTo((Boolean) right);
 					break;
-				case DateTimeOffset:
-					result = ((Timestamp) left).compareTo((Timestamp) right);
+				case Guid:
+					result = ((UUID) left).compareTo((UUID) right);
 					break;
 				default:
 					break;
