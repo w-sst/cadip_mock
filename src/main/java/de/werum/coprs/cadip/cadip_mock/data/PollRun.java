@@ -119,7 +119,7 @@ public class PollRun {
 	// }
 
 	private void createSession(Path sessionPath, Matcher sessionMatcher) {
-		
+
 		storage.createFileSet(sessionPath.getFileName().toString());
 		LocalDateTime start = LocalDateTime.parse(sessionMatcher.group(3), dateTimeFormatter);
 		LocalDateTime stop = start.plusMinutes(16).plusSeconds(23);
@@ -174,8 +174,9 @@ public class PollRun {
 							(LocalDateTime) null,
 							attr.size(),
 							config.isRetransfer());
-					LOG.debug("added newFile: {}", newFile);
-					files.add(newFile);
+					if (files.add(newFile)) {
+						LOG.debug("added newFile: {}", newFile);
+					}
 				}
 			}
 			return FileVisitResult.CONTINUE;
