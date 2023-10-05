@@ -11,10 +11,13 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
+import java.util.SplittableRandom;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
@@ -22,6 +25,7 @@ import org.apache.logging.log4j.Logger;
 
 import de.werum.coprs.cadip.cadip_mock.config.InboxConfiguration;
 import de.werum.coprs.cadip.cadip_mock.data.model.File;
+import de.werum.coprs.cadip.cadip_mock.data.model.QualityInfo;
 import de.werum.coprs.cadip.cadip_mock.data.model.Session;
 
 public class PollRun {
@@ -58,7 +62,7 @@ public class PollRun {
 				if (sessionMatcher.find()) {
 					processSession(entryPath, sessionMatcher);
 				} else {
-					LOG.trace("directory not in pattern: {}", entryPath.getFileName());
+					LOG.debug("directory not in pattern: {}", entryPath.getFileName());
 				}
 			});
 		} finally {
@@ -143,6 +147,25 @@ public class PollRun {
 				stop,
 				config.isDownlinkStatusOK(),
 				config.isDeliveryPushOK());
+		Random rand = new Random();
+		for (long i = 1; i <= config.getNumChannels(); i++) {
+			QualityInfo newQualityInfo = new QualityInfo(i,
+					sessionPath.getFileName().toString(),
+					rand.nextLong(),
+					rand.nextLong(),
+					rand.nextLong(),
+					rand.nextLong(),
+					rand.nextLong(),
+					rand.nextLong(),
+					rand.nextLong(),
+					rand.nextLong(),
+					start.minusMonths(i+1).minusHours(i),
+					start.minusMonths(i+1),
+					rand.nextLong(),
+					rand.nextLong());
+			storage.addQualityInfoToList(newQualityInfo);
+			LOG.debug("added newQualityInfo: {}", newQualityInfo);
+		}
 		LOG.debug("added newSession: {}", newSession);
 		storage.addSessionToList(newSession);
 	}

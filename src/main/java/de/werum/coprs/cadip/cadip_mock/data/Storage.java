@@ -27,6 +27,7 @@ import org.apache.olingo.server.api.ODataApplicationException;
 import org.apache.olingo.server.api.uri.UriParameter;
 
 import de.werum.coprs.cadip.cadip_mock.data.model.File;
+import de.werum.coprs.cadip.cadip_mock.data.model.QualityInfo;
 import de.werum.coprs.cadip.cadip_mock.data.model.Session;
 import de.werum.coprs.cadip.cadip_mock.service.edm.EdmProvider;
 import de.werum.coprs.cadip.cadip_mock.util.MappingUtil;
@@ -36,10 +37,12 @@ public class Storage {
 
 	private static final Logger LOG = LogManager.getLogger(Storage.class);
 	private List<Session> sessionsList;
+	private List<QualityInfo> qualityInfoList;
 	private Map<String, Set<File>> filesList;
 
 	public Storage() {
 		sessionsList = new ArrayList<Session>();
+		qualityInfoList = new ArrayList<QualityInfo>();
 		filesList = new HashMap<>();
 	}
 
@@ -64,9 +67,9 @@ public class Storage {
 	public EntityCollection readEntitySetData(String entityName) throws ODataApplicationException {
 		switch (entityName) {
 		case EdmProvider.ET_SESSION_NAME:
-			return getSessionsSet();
+			return getSessionCollection();
 		case EdmProvider.ET_FILE_NAME:
-			return getFilesSet();
+			return getFileCollection();
 		default:
 			throw new ODataApplicationException("EntitySet for requested key doesn't exist",
 					HttpStatusCode.NOT_FOUND.getStatusCode(),
@@ -100,6 +103,10 @@ public class Storage {
 	public void addSessionToList(Session sesison) {
 		sessionsList.add(sesison);
 	}
+	
+	public void addQualityInfoToList(QualityInfo qI) {
+		qualityInfoList.add(qI);
+	}
 
 	public void createFileSet(String sessionId) {
 		filesList.put(sessionId, new LinkedHashSet<File>());
@@ -120,7 +127,47 @@ public class Storage {
 		return null;
 	}
 
-	private EntityCollection getSessionsSet() {
+	public EntityCollection getEntitiesForSession(Entity sourceEntity, EdmEntityType targetEntityType)
+			throws ODataApplicationException {
+		EntityCollection entitySet = new EntityCollection();
+		List<Entity> entityList = entitySet.getEntities();
+		String sessionId = (String) sourceEntity.getProperty("SessionId").getValue();
+		if (targetEntityType.getName().equals(EdmProvider.ET_FILE_NAME)) {
+			Set<File> fileSet = filesList.get(sessionId);
+			if (fileSet == null) {
+				throw new ODataApplicationException("Found no Files for Session: " + sourceEntity,
+						HttpStatusCode.NOT_FOUND.getStatusCode(),
+						Locale.ENGLISH);
+			}
+			entityList.addAll(MappingUtil.mapFileListToEntityList(fileSet));
+		} else if (targetEntityType.getName().equals(EdmProvider.ET_QUALITYINFO_NAME)) {
+			for (QualityInfo qualityInfo : qualityInfoList) {
+				if (qualityInfo.getSessionId().equals(sessionId)) {
+					entityList.add(MappingUtil.mapQualityInfoToEntity(qualityInfo));
+				}
+			}
+			
+		}
+		return entitySet;
+	}
+
+	public Entity getEntityForSession(Entity sourceEntity, EdmEntityType targetEntityType)
+			throws ODataApplicationException {
+		String sessionId = (String) sourceEntity.getProperty("SessionId").getValue();
+		if (targetEntityType.getName().equals(EdmProvider.ET_QUALITYINFO_NAME)) {
+			for (QualityInfo qualityInfo : qualityInfoList) {
+				if (qualityInfo.getSessionId().equals(sessionId)) {
+					return MappingUtil.mapQualityInfoToEntity(qualityInfo);
+				}
+			}
+			throw new ODataApplicationException("Found no QualityInfo for Session: " + sourceEntity,
+					HttpStatusCode.NOT_FOUND.getStatusCode(),
+					Locale.ENGLISH);
+		}
+		return null;
+	}
+
+	private EntityCollection getSessionCollection() {
 		EntityCollection entitySet = new EntityCollection();
 		List<Entity> entityList = entitySet.getEntities();
 		for (Session session : sessionsList) {
@@ -130,7 +177,7 @@ public class Storage {
 		return entitySet;
 	}
 
-	private EntityCollection getFilesSet() {
+	private EntityCollection getFileCollection() {
 		EntityCollection entitySet = new EntityCollection();
 		List<Entity> entityList = entitySet.getEntities();
 		filesList.forEach((k, v) -> {
@@ -148,13 +195,9 @@ public class Storage {
 		// the list of entities at runtime
 		EntityCollection entitySet = readEntitySetData(edmEntityType.getName());
 
-		/* generic approach to find the requested entity */
 		Entity requestedEntity = OlingoUtil.findEntity(edmEntityType, entitySet, keyParams);
 
 		if (requestedEntity == null) {
-			// this variable is null if our data doesn't contain an entity for the requested
-			// key
-			// Throw suitable exception
 			throw new ODataApplicationException("Entity for requested key doesn't exist",
 					HttpStatusCode.NOT_FOUND.getStatusCode(),
 					Locale.ENGLISH);

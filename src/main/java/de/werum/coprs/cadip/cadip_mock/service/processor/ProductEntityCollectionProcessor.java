@@ -16,6 +16,7 @@ import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.EntityCollection;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
+import org.apache.olingo.commons.api.edm.EdmNavigationProperty;
 import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
 import org.apache.olingo.commons.api.edm.EdmProperty;
 import org.apache.olingo.commons.api.edm.FullQualifiedName;
@@ -34,8 +35,10 @@ import org.apache.olingo.server.api.serializer.ODataSerializer;
 import org.apache.olingo.server.api.serializer.SerializerResult;
 import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriInfoResource;
+import org.apache.olingo.server.api.uri.UriParameter;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
+import org.apache.olingo.server.api.uri.UriResourceNavigation;
 import org.apache.olingo.server.api.uri.UriResourcePrimitiveProperty;
 import org.apache.olingo.server.api.uri.queryoption.CountOption;
 import org.apache.olingo.server.api.uri.queryoption.FilterOption;
@@ -68,19 +71,55 @@ public class ProductEntityCollectionProcessor implements EntityCollectionProcess
 	@Override
 	public void readEntityCollection(ODataRequest request, ODataResponse response, UriInfo uriInfo,
 			ContentType responseFormat) throws ODataApplicationException, ODataLibraryException {
-		// 1st we have retrieve the requested EntitySet from the uriInfo object
-		// (representation of the parsed service URI)
+		// read infos from oData request
 		List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
-		UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0); // in our example, the
-																									// first segment is
-																									// the EntitySet
-		EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
-		LOG.debug("Request for Collection: {}", request.getRawRequestUri());
-		// 2nd: fetch the data from backend for this requested EntitySetName
-		// it has to be delivered as EntitySet object
-		EntityCollection entitySet = storage.readEntitySetData(edmEntitySet);
-		List<Entity> entityList = entitySet.getEntities();
+		int segmentCount = resourcePaths.size();
+		UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
 
+		EdmEntitySet firstEdmEntitySet = uriResourceEntitySet.getEntitySet();
+		EdmEntitySet edmEntitySet;
+
+		List<Entity> entityList;
+		EntityCollection entitySet;
+		// segmentCount == 1 means no navigation was used
+		if (segmentCount == 1) {
+			edmEntitySet = firstEdmEntitySet;
+			LOG.debug("Request for Collection: {}", request.getRawRequestUri());
+			entitySet = storage.readEntitySetData(edmEntitySet);
+			entityList = entitySet.getEntities();
+			
+		// segmentCount == 2 means to get the entities for a specific session
+		// as "foreign key" is the sessionId used that all entities have
+		} else if (segmentCount == 2) {
+			LOG.debug("Request for Collection of a specific Session: {}", request.getRawRequestUri());
+			UriResource lastSegment = resourcePaths.get(1);
+			if (lastSegment instanceof UriResourceNavigation) {
+				UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) lastSegment;
+				EdmNavigationProperty edmNavigationProperty = uriResourceNavigation.getProperty();
+				EdmEntityType targetEntityType = edmNavigationProperty.getType();
+				edmEntitySet = (EdmEntitySet) firstEdmEntitySet
+						.getRelatedBindingTarget(edmNavigationProperty.getName());
+				if (edmEntitySet == null) {
+					throw new ODataApplicationException("Nothing found for given Navigation Set",
+							HttpStatusCode.BAD_REQUEST.getStatusCode(),
+							Locale.ENGLISH);
+				}
+				List<UriParameter> keyPredicates = uriResourceEntitySet.getKeyPredicates();
+				Entity sourceEntity = storage.readEntityData(firstEdmEntitySet, keyPredicates);
+				entitySet = storage.getEntitiesForSession(sourceEntity, targetEntityType);
+				entityList = entitySet.getEntities();
+			} else {
+				throw new ODataApplicationException("Only Navigation is supported as 2. segment",
+						HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(),
+						Locale.ROOT);
+			}
+		} else {
+			throw new ODataApplicationException("More than 2 Segments is not supported",
+					HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(),
+					Locale.ROOT);
+		}
+
+		// apply all query functions
 		filterEntities(entityList, uriInfo.getFilterOption());
 		orderEntities(entityList, uriInfo.getOrderByOption());
 		skipEntities(entityList, uriInfo.getSkipOption());
@@ -88,11 +127,9 @@ public class ProductEntityCollectionProcessor implements EntityCollectionProcess
 		CountOption countOption = uriInfo.getCountOption();
 		countEntities(entityList, entitySet, countOption);
 
-		// 3rd: create a serializer based on the requested format (json)
+		// convert Set to InputStream
 		ODataSerializer serializer = odata.createSerializer(responseFormat);
 
-		// 4th: Now serialize the content: transform from the EntitySet object to
-		// InputStream
 		EdmEntityType edmEntityType = edmEntitySet.getEntityType();
 		ContextURL contextUrl = ContextURL.with().entitySet(edmEntitySet).build();
 
@@ -103,7 +140,7 @@ public class ProductEntityCollectionProcessor implements EntityCollectionProcess
 				opts);
 		InputStream serializedContent = serializerResult.getContent();
 
-		// Finally: configure the response object: set the body, headers and status code
+		// set results as response
 		response.setContent(serializedContent);
 		response.setStatusCode(HttpStatusCode.OK.getStatusCode());
 		response.setHeader(HttpHeader.CONTENT_TYPE, responseFormat.toContentTypeString());
@@ -116,22 +153,16 @@ public class ProductEntityCollectionProcessor implements EntityCollectionProcess
 			try {
 				Iterator<Entity> entityIterator = entityList.iterator();
 
-				// Evaluate the expression for each entity
-				// If the expression is evaluated to "true", keep the entity otherwise remove it
-				// from the entityList
+				// calls the FilterExpressioVisitor for each entity and removes them from the
+				// list if it returns false.
 				while (entityIterator.hasNext()) {
-					// To evaluate the the expression, create an instance of the Filter Expression
-					// Visitor and pass the current entity to the constructor
+
 					Entity currentEntity = entityIterator.next();
 					FilterExpressionVisitor expressionVisitor = new FilterExpressionVisitor(currentEntity);
 
-					// Evaluating the expression
 					Object visitorResult = filterExpression.accept(expressionVisitor);
-					// The result of the filter expression must be of type Edm.Boolean
 					if (visitorResult instanceof Boolean) {
 						if (!Boolean.TRUE.equals(visitorResult)) {
-							// The expression evaluated to false (or null), so we have to remove the
-							// currentEntity from entityList
 							entityIterator.remove();
 						}
 					} else {
@@ -139,7 +170,7 @@ public class ProductEntityCollectionProcessor implements EntityCollectionProcess
 								HttpStatusCode.BAD_REQUEST.getStatusCode(),
 								Locale.ENGLISH);
 					}
-				} // End while
+				}
 			} catch (ExpressionVisitException e) {
 				throw new ODataApplicationException("Exception in filter evaluation",
 						HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
@@ -241,7 +272,7 @@ public class ProductEntityCollectionProcessor implements EntityCollectionProcess
 				default:
 					break;
 				}
-				// if 'desc' is specified in the URI, change the order
+				// reverse the order if 'desc' is specified in the orderby option
 				if (isDescending) {
 					return -result;
 				}

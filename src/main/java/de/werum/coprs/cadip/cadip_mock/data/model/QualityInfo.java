@@ -3,6 +3,7 @@ package de.werum.coprs.cadip.cadip_mock.data.model;
 import java.time.LocalDateTime;
 
 public class QualityInfo {
+
 	private long channel;
 	private String sessionId;
 	private long acquiredTFs;
@@ -38,6 +39,16 @@ public class QualityInfo {
 		this.totalVolume = totalVolume;
 	}
 
+	@Override
+	public String toString() {
+		return "QualityInfo [channel=" + channel + ", sessionId=" + sessionId + ", acquiredTFs=" + acquiredTFs
+				+ ", errorTFs=" + errorTFs + ", correctedTFs=" + correctedTFs + ", uncorrectableTFs=" + uncorrectableTFs
+				+ ", dataTFs=" + dataTFs + ", errorDataTFs=" + errorDataTFs + ", correctedDataTFs=" + correctedDataTFs
+				+ ", uncorrectableDataTFs=" + uncorrectableDataTFs + ", deliveryStart=" + deliveryStart
+				+ ", deliveryStop=" + deliveryStop + ", totalChunks=" + totalChunks + ", totalVolume=" + totalVolume
+				+ "]";
+	}
+	
 	public long getChannel() {
 		return channel;
 	}

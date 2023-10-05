@@ -2,15 +2,23 @@ package de.werum.coprs.cadip.cadip_mock.service.processor;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.olingo.commons.api.Constants;
 import org.apache.olingo.commons.api.data.ContextURL;
+import org.apache.olingo.commons.api.data.ContextURL.Suffix;
 import org.apache.olingo.commons.api.data.Entity;
+import org.apache.olingo.commons.api.data.EntityCollection;
+import org.apache.olingo.commons.api.data.Link;
+import org.apache.olingo.commons.api.edm.EdmElement;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
+import org.apache.olingo.commons.api.edm.EdmNavigationProperty;
+import org.apache.olingo.commons.api.edm.EdmNavigationPropertyBinding;
 import org.apache.olingo.commons.api.format.ContentType;
 import org.apache.olingo.commons.api.http.HttpHeader;
 import org.apache.olingo.commons.api.http.HttpStatusCode;
@@ -29,6 +37,10 @@ import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriParameter;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
+import org.apache.olingo.server.api.uri.UriResourceNavigation;
+import org.apache.olingo.server.api.uri.queryoption.ExpandItem;
+import org.apache.olingo.server.api.uri.queryoption.ExpandOption;
+
 import de.werum.coprs.cadip.cadip_mock.data.Storage;
 import de.werum.coprs.cadip.cadip_mock.data.model.File;
 import de.werum.coprs.cadip.cadip_mock.service.edm.EdmProvider;
@@ -59,29 +71,78 @@ public class ProductEntityProcessor implements EntityProcessor, MediaEntityProce
 
 		// 1. retrieve the Entity Type
 		List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
-		// Note: only in our example we can assume that the first segment is the
-		// EntitySet
+
 		UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
 		EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
 
 		LOG.debug("Request for Entity: {}", request.getRawRequestUri());
 
-		// 2. retrieve the data from backend
 		List<UriParameter> keyPredicates = uriResourceEntitySet.getKeyPredicates();
 		Entity entity = storage.readEntityData(edmEntitySet, keyPredicates);
 
-		// 3. serialize
+		ExpandOption expandOption = uriInfo.getExpandOption();
+		if (expandOption != null) {
+			List<ExpandItem> expandItems = new ArrayList<ExpandItem>();
+			expandItems.addAll(expandOption.getExpandItems());
+
+			ExpandItem expandItem = expandOption.getExpandItems().get(0);
+			List<EdmNavigationProperty> edmNavigationProperties = new ArrayList<EdmNavigationProperty>();
+			if (expandItem.isStar()) {
+				List<EdmNavigationPropertyBinding> bindings = edmEntitySet.getNavigationPropertyBindings();
+				for (EdmNavigationPropertyBinding binding : bindings) {
+					EdmElement property = edmEntitySet.getEntityType().getProperty(binding.getPath());
+					if (property instanceof EdmNavigationProperty) {
+						edmNavigationProperties.add((EdmNavigationProperty) property);
+					}
+				}
+			} else {
+				UriResource expandUriResource = expandItem.getResourcePath().getUriResourceParts().get(0);
+				if (expandUriResource instanceof UriResourceNavigation) {
+					edmNavigationProperties.add(((UriResourceNavigation) expandUriResource).getProperty());
+				}
+			}
+
+			if (edmNavigationProperties.size() > 0) {
+				for (EdmNavigationProperty edmNavigationProperty : edmNavigationProperties) {
+					EdmEntityType expandEdmEntityType = edmNavigationProperty.getType();
+					String navPropName = edmNavigationProperty.getName();
+
+					Link link = new Link();
+					link.setTitle(navPropName);
+					link.setRel("TODO");
+					if (edmNavigationProperty.isCollection()) {
+						EntityCollection expandEntityCollection = storage.getEntitiesForSession(entity,
+								expandEdmEntityType);
+						if (expandEntityCollection != null) {
+							link.setInlineEntitySet(expandEntityCollection);
+						}
+					} else {
+						Entity expandEntity = storage.getEntityForSession(entity, expandEdmEntityType);
+						if (expandEntity != null) {
+							link.setInlineEntity(expandEntity);
+						}
+					}
+					entity.getNavigationLinks().add(link);
+				}
+			}
+
+		}
+
+		// convert entity to InputStream
 		EdmEntityType entityType = edmEntitySet.getEntityType();
 
-		ContextURL contextUrl = ContextURL.with().entitySet(edmEntitySet).build();
-		// expand and select currently not supported
-		EntitySerializerOptions options = EntitySerializerOptions.with().contextURL(contextUrl).build();
+		String selectList = odata.createUriHelper().buildContextURLSelectList(entityType, expandOption, null);
+		ContextURL contextUrl = ContextURL.with().entitySet(edmEntitySet).selectList(selectList).suffix(Suffix.ENTITY)
+				.build();
+
+		EntitySerializerOptions serializerOptions = EntitySerializerOptions.with().contextURL(contextUrl)
+				.expand(expandOption).build();
 
 		ODataSerializer serializer = odata.createSerializer(responseFormat);
-		SerializerResult serializerResult = serializer.entity(serviceMetadata, entityType, entity, options);
+		SerializerResult serializerResult = serializer.entity(serviceMetadata, entityType, entity, serializerOptions);
 		InputStream entityStream = serializerResult.getContent();
 
-		// 4. configure the response object
+		// set results as response
 		response.setContent(entityStream);
 		response.setStatusCode(HttpStatusCode.OK.getStatusCode());
 		response.setHeader(HttpHeader.CONTENT_TYPE, responseFormat.toContentTypeString());
@@ -91,8 +152,6 @@ public class ProductEntityProcessor implements EntityProcessor, MediaEntityProce
 	@Override
 	public void readMediaEntity(ODataRequest request, ODataResponse response, UriInfo uriInfo,
 			ContentType responseFormat) throws ODataApplicationException, ODataLibraryException {
-		// Since our scenario do not contain navigations from media entities. We can
-		// keep things simple and check only the first resource path of the URI.
 		final UriResource firstResoucePart = uriInfo.getUriResourceParts().get(0);
 
 		final EdmEntitySet edmEntitySet = OlingoUtil.getEdmEntitySet(uriInfo);

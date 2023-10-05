@@ -12,6 +12,8 @@ import org.apache.olingo.commons.api.edm.provider.CsdlEntityContainer;
 import org.apache.olingo.commons.api.edm.provider.CsdlEntityContainerInfo;
 import org.apache.olingo.commons.api.edm.provider.CsdlEntitySet;
 import org.apache.olingo.commons.api.edm.provider.CsdlEntityType;
+import org.apache.olingo.commons.api.edm.provider.CsdlNavigationProperty;
+import org.apache.olingo.commons.api.edm.provider.CsdlNavigationPropertyBinding;
 import org.apache.olingo.commons.api.edm.provider.CsdlProperty;
 import org.apache.olingo.commons.api.edm.provider.CsdlPropertyRef;
 import org.apache.olingo.commons.api.edm.provider.CsdlSchema;
@@ -33,6 +35,9 @@ public class EdmProvider extends CsdlAbstractEdmProvider {
 	public static final String ET_FILE_NAME = "File";
 	public static final FullQualifiedName ET_FILE_FQN = new FullQualifiedName(NAMESPACE, ET_FILE_NAME);
 
+	public static final String ET_QUALITYINFO_NAME = "QualityInfo";
+	public static final FullQualifiedName ET_QUALITYINFO_FQN = new FullQualifiedName(NAMESPACE, ET_QUALITYINFO_NAME);
+
 	// Entity Set Names
 	public static final String ES_SESSIONS_NAME = "Sessions";
 	public static final String ES_FILES_NAME = "Files";
@@ -41,7 +46,6 @@ public class EdmProvider extends CsdlAbstractEdmProvider {
 	public CsdlEntityType getEntityType(FullQualifiedName entityTypeName) throws ODataException {
 
 		if (entityTypeName.equals(ET_SESSION_FQN)) {
-			// create EntityType properties
 			CsdlProperty id = new CsdlProperty().setName("Id")
 					.setType(EdmPrimitiveTypeKind.Guid.getFullQualifiedName());
 			CsdlProperty sessionId = new CsdlProperty().setName("SessionId")
@@ -81,19 +85,26 @@ public class EdmProvider extends CsdlAbstractEdmProvider {
 			CsdlProperty deliveryPushOK = new CsdlProperty().setName("DeliveryPushOK")
 					.setType(EdmPrimitiveTypeKind.Boolean.getFullQualifiedName());
 
-			// create CsdlPropertyRef for Key element
 			CsdlPropertyRef propertyRef = new CsdlPropertyRef();
 			propertyRef.setName("Id");
 
-			// configure EntityType
+			CsdlNavigationProperty fileNavProp = new CsdlNavigationProperty().setName("Files").setType(ET_FILE_FQN)
+					.setCollection(true);
+			CsdlNavigationProperty qualityInfoNavProp = new CsdlNavigationProperty().setName("QualityInfo")
+					.setType(ET_QUALITYINFO_FQN).setCollection(true);
+			List<CsdlNavigationProperty> navPropList = new ArrayList<CsdlNavigationProperty>();
+			navPropList.add(fileNavProp);
+			navPropList.add(qualityInfoNavProp);
+
 			CsdlEntityType entityType = new CsdlEntityType();
 			entityType.setName(ET_SESSION_NAME);
 			entityType.setProperties(Arrays.asList(id, sessionId, numChannels, publicationDate, satellite,
 					stationUnitId, downlinkOrbit, acquisitionId, antennaId, frontEndId, retransfer, antennaStatusOK,
 					frontEndStatusOK, plannedDataStart, plannedDataStop, downlinkStart, downlinkStop, downlinkStatusOK,
 					deliveryPushOK));
-
 			entityType.setKey(Collections.singletonList(propertyRef));
+			entityType.setNavigationProperties(navPropList);
+
 			return entityType;
 		} else if (entityTypeName.equals(ET_FILE_FQN)) {
 			CsdlProperty id = new CsdlProperty().setName("Id")
@@ -117,11 +128,9 @@ public class EdmProvider extends CsdlAbstractEdmProvider {
 			CsdlProperty retransfer = new CsdlProperty().setName("Retransfer")
 					.setType(EdmPrimitiveTypeKind.Boolean.getFullQualifiedName());
 
-			// create CsdlPropertyRef for Key element
 			CsdlPropertyRef propertyRef = new CsdlPropertyRef();
 			propertyRef.setName("Id");
 
-			// configure EntityType
 			CsdlEntityType entityType = new CsdlEntityType();
 			entityType.setName(ET_FILE_NAME);
 			entityType.setProperties(Arrays.asList(id, name, sessionId, channel, blockNumber, finalBlock,
@@ -129,6 +138,44 @@ public class EdmProvider extends CsdlAbstractEdmProvider {
 
 			entityType.setKey(Collections.singletonList(propertyRef));
 			entityType.setHasStream(true);
+
+			return entityType;
+		} else if (entityTypeName.equals(ET_QUALITYINFO_FQN)) {
+
+			CsdlProperty channel = new CsdlProperty().setName("Channel")
+					.setType(EdmPrimitiveTypeKind.Int64.getFullQualifiedName());
+			CsdlProperty sessionId = new CsdlProperty().setName("SessionId")
+					.setType(EdmPrimitiveTypeKind.String.getFullQualifiedName());
+			CsdlProperty acquiredTFs = new CsdlProperty().setName("AcquiredTFs")
+					.setType(EdmPrimitiveTypeKind.Int64.getFullQualifiedName());
+			CsdlProperty errorTFs = new CsdlProperty().setName("ErrorTFs")
+					.setType(EdmPrimitiveTypeKind.Int64.getFullQualifiedName());
+			CsdlProperty correctedTFs = new CsdlProperty().setName("CorrectedTFs")
+					.setType(EdmPrimitiveTypeKind.Int64.getFullQualifiedName());
+			CsdlProperty uncorrectableTFs = new CsdlProperty().setName("UncorrectableTFs")
+					.setType(EdmPrimitiveTypeKind.Int64.getFullQualifiedName());
+			CsdlProperty dataTFs = new CsdlProperty().setName("DataTFs")
+					.setType(EdmPrimitiveTypeKind.Int64.getFullQualifiedName());
+			CsdlProperty errorDataTFs = new CsdlProperty().setName("ErrorDataTFs")
+					.setType(EdmPrimitiveTypeKind.Int64.getFullQualifiedName());
+			CsdlProperty correctedDataTFs = new CsdlProperty().setName("CorrectedDataTFs")
+					.setType(EdmPrimitiveTypeKind.Int64.getFullQualifiedName());
+			CsdlProperty uncorrectableDataTFs = new CsdlProperty().setName("UncorrectableDataTFs")
+					.setType(EdmPrimitiveTypeKind.Int64.getFullQualifiedName());
+			CsdlProperty deliveryStart = new CsdlProperty().setName("DeliveryStart")
+					.setType(EdmPrimitiveTypeKind.DateTimeOffset.getFullQualifiedName());
+			CsdlProperty deliveryStop = new CsdlProperty().setName("DeliveryStop")
+					.setType(EdmPrimitiveTypeKind.DateTimeOffset.getFullQualifiedName());
+			CsdlProperty totalChunks = new CsdlProperty().setName("TotalChunks")
+					.setType(EdmPrimitiveTypeKind.Int64.getFullQualifiedName());
+			CsdlProperty totalVolume = new CsdlProperty().setName("TotalVolume")
+					.setType(EdmPrimitiveTypeKind.Int64.getFullQualifiedName());
+
+			CsdlEntityType entityType = new CsdlEntityType();
+			entityType.setName(ET_QUALITYINFO_NAME);
+			entityType.setProperties(Arrays.asList(channel, sessionId, acquiredTFs, errorTFs, correctedTFs,
+					uncorrectableTFs, dataTFs, errorDataTFs, correctedDataTFs, uncorrectableDataTFs, deliveryStart,
+					deliveryStop, totalChunks, totalVolume));
 
 			return entityType;
 		}
@@ -143,6 +190,16 @@ public class EdmProvider extends CsdlAbstractEdmProvider {
 				CsdlEntitySet entitySet = new CsdlEntitySet();
 				entitySet.setName(ES_SESSIONS_NAME);
 				entitySet.setType(ET_SESSION_FQN);
+				CsdlNavigationPropertyBinding fileNavPropBinding = new CsdlNavigationPropertyBinding();
+				fileNavPropBinding.setPath("Files");
+				fileNavPropBinding.setTarget("Files");
+				CsdlNavigationPropertyBinding qualityInfoNavPropBinding = new CsdlNavigationPropertyBinding();
+				qualityInfoNavPropBinding.setPath("QualityInfo");
+				qualityInfoNavPropBinding.setTarget("QualityInfo");
+				List<CsdlNavigationPropertyBinding> navPropBindingList = new ArrayList<CsdlNavigationPropertyBinding>();
+				navPropBindingList.add(fileNavPropBinding);
+				navPropBindingList.add(qualityInfoNavPropBinding);
+				entitySet.setNavigationPropertyBindings(navPropBindingList);
 
 				return entitySet;
 			} else if (entitySetName.equals(ES_FILES_NAME)) {
@@ -160,11 +217,10 @@ public class EdmProvider extends CsdlAbstractEdmProvider {
 	@Override
 	public CsdlEntityContainer getEntityContainer() throws ODataException {
 
-		// create EntitySets
 		List<CsdlEntitySet> entitySets = new ArrayList<CsdlEntitySet>();
 		entitySets.add(getEntitySet(CONTAINER, ES_SESSIONS_NAME));
 		entitySets.add(getEntitySet(CONTAINER, ES_FILES_NAME));
-		// create EntityContainer
+
 		CsdlEntityContainer entityContainer = new CsdlEntityContainer();
 		entityContainer.setName(CONTAINER_NAME);
 		entityContainer.setEntitySets(entitySets);
@@ -188,20 +244,16 @@ public class EdmProvider extends CsdlAbstractEdmProvider {
 
 	@Override
 	public List<CsdlSchema> getSchemas() throws ODataException {
-		// create Schema
 		CsdlSchema schema = new CsdlSchema();
 		schema.setNamespace(NAMESPACE);
 
-		// add EntityTypes
 		List<CsdlEntityType> entityTypes = new ArrayList<CsdlEntityType>();
 		entityTypes.add(getEntityType(ET_SESSION_FQN));
 		entityTypes.add(getEntityType(ET_FILE_FQN));
+		entityTypes.add(getEntityType(ET_QUALITYINFO_FQN));
 		schema.setEntityTypes(entityTypes);
 
-		// add EntityContainer
 		schema.setEntityContainer(getEntityContainer());
-
-		// finally
 		List<CsdlSchema> schemas = new ArrayList<CsdlSchema>();
 		schemas.add(schema);
 

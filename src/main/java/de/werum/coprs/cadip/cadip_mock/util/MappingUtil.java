@@ -3,6 +3,9 @@ package de.werum.coprs.cadip.cadip_mock.util;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.Property;
@@ -11,6 +14,7 @@ import org.apache.olingo.commons.api.ex.ODataRuntimeException;
 import org.apache.olingo.commons.api.format.ContentType;
 
 import de.werum.coprs.cadip.cadip_mock.data.model.File;
+import de.werum.coprs.cadip.cadip_mock.data.model.QualityInfo;
 import de.werum.coprs.cadip.cadip_mock.data.model.Session;
 
 public class MappingUtil {
@@ -37,6 +41,14 @@ public class MappingUtil {
 		fE.setId(createId("Files", file.getId()));
 
 		return fE;
+	}
+
+	public static List<Entity> mapFileListToEntityList(Collection<File> fileList) {
+		List<Entity> entityList = new ArrayList<Entity>();
+		fileList.forEach(o -> {
+			entityList.add(mapFileToEntity(o));
+		});
+		return entityList;
 	}
 
 	public static Entity mapSessionToEntity(Session session) {
@@ -81,6 +93,31 @@ public class MappingUtil {
 				.addProperty(new Property(null, "DeliveryPushOK", ValueType.PRIMITIVE, session.isDeliveryPushOK()));
 		sE.setId(createId("Sessions", session.getId()));
 		return sE;
+	}
+
+	public static Entity mapQualityInfoToEntity(QualityInfo qualityInfo) {
+		final Entity qE = new Entity()
+				.addProperty(new Property(null, "Channel", ValueType.PRIMITIVE, qualityInfo.getChannel()))
+				.addProperty(new Property(null, "SessionId", ValueType.PRIMITIVE, qualityInfo.getSessionId()))
+				.addProperty(new Property(null, "AcquiredTFs", ValueType.PRIMITIVE, qualityInfo.getAcquiredTFs()))
+				.addProperty(new Property(null, "ErrorTFs", ValueType.PRIMITIVE, qualityInfo.getErrorTFs()))
+				.addProperty(new Property(null, "CorrectedTFs", ValueType.PRIMITIVE, qualityInfo.getCorrectedTFs()))
+				.addProperty(
+						new Property(null, "UncorrectableTFs", ValueType.PRIMITIVE, qualityInfo.getUncorrectableTFs()))
+				.addProperty(new Property(null, "DataTFs", ValueType.PRIMITIVE, qualityInfo.getDataTFs()))
+				.addProperty(new Property(null, "ErrorDataTFs", ValueType.PRIMITIVE, qualityInfo.getErrorDataTFs()))
+				.addProperty(
+						new Property(null, "CorrectedDataTFs", ValueType.PRIMITIVE, qualityInfo.getCorrectedDataTFs()))
+				.addProperty(new Property(null,
+						"UncorrectableDataTFs",
+						ValueType.PRIMITIVE,
+						qualityInfo.getUncorrectableDataTFs()))
+				.addProperty(new Property(null, "DeliveryStart", ValueType.PRIMITIVE, TimeUtil.convertLocalDateTimeToTimestamp(qualityInfo.getDeliveryStart())))
+				.addProperty(new Property(null, "DeliveryStop", ValueType.PRIMITIVE, TimeUtil.convertLocalDateTimeToTimestamp(qualityInfo.getDeliveryStop())))
+				.addProperty(new Property(null, "TotalChunks", ValueType.PRIMITIVE, qualityInfo.getTotalChunks()))
+				.addProperty(new Property(null, "TotalVolume", ValueType.PRIMITIVE, qualityInfo.getTotalVolume()));
+
+		return qE;
 	}
 
 	// public static EntityCollection
