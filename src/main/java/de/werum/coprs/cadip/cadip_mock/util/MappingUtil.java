@@ -112,7 +112,10 @@ public class MappingUtil {
 						ValueType.PRIMITIVE,
 						qualityInfo.getUncorrectableDataTFs()))
 				.addProperty(new Property(null, "DeliveryStart", ValueType.PRIMITIVE, TimeUtil.convertLocalDateTimeToTimestamp(qualityInfo.getDeliveryStart())))
-				.addProperty(new Property(null, "DeliveryStop", ValueType.PRIMITIVE, TimeUtil.convertLocalDateTimeToTimestamp(qualityInfo.getDeliveryStop())))
+				.addProperty(new Property(null,
+						"DeliveryStop",
+						ValueType.PRIMITIVE,
+						TimeUtil.convertLocalDateTimeToTimestamp(qualityInfo.getDeliveryStop())))
 				.addProperty(new Property(null, "TotalChunks", ValueType.PRIMITIVE, qualityInfo.getTotalChunks()))
 				.addProperty(new Property(null, "TotalVolume", ValueType.PRIMITIVE, qualityInfo.getTotalVolume()));
 

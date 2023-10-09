@@ -157,8 +157,8 @@ public class PollRun {
 					rand.nextLong(),
 					rand.nextLong(),
 					rand.nextLong(),
-					start.minusMonths(i+1).minusHours(i),
-					start.minusMonths(i+1),
+					start.minusMonths(i + 1).minusHours(i),
+					start.minusMonths(i + 1),
 					rand.nextLong(),
 					rand.nextLong());
 			storage.addQualityInfoToList(newQualityInfo);

@@ -103,7 +103,7 @@ public class Storage {
 	public void addSessionToList(Session sesison) {
 		sessionsList.add(sesison);
 	}
-	
+
 	public void addQualityInfoToList(QualityInfo qI) {
 		qualityInfoList.add(qI);
 	}
@@ -146,7 +146,7 @@ public class Storage {
 					entityList.add(MappingUtil.mapQualityInfoToEntity(qualityInfo));
 				}
 			}
-			
+
 		}
 		return entitySet;
 	}
@@ -213,7 +213,8 @@ public class Storage {
 		return fileStream;
 	}
 
-	public InputStream readMedia(String filePath, long offset, long length) throws FileNotFoundException, ODataApplicationException {
+	public InputStream readMedia(String filePath, long offset, long length)
+			throws FileNotFoundException, ODataApplicationException {
 		RandomAccessFile randomAccessFile = new RandomAccessFile(filePath, "r");
 		byte[] buffer = new byte[(int) length];
 		try {
@@ -221,7 +222,7 @@ public class Storage {
 			randomAccessFile.readFully(buffer);
 		} catch (IOException e) {
 			LOG.error("Error reading {} and writing partially into buffer", filePath, e);
-			throw new ODataApplicationException("Error reading requested File" ,
+			throw new ODataApplicationException("Error reading requested File",
 					HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
 					Locale.ENGLISH);
 		} finally {

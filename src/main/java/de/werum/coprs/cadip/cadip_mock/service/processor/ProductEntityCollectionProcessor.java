@@ -87,9 +87,9 @@ public class ProductEntityCollectionProcessor implements EntityCollectionProcess
 			LOG.debug("Request for Collection: {}", request.getRawRequestUri());
 			entitySet = storage.readEntitySetData(edmEntitySet);
 			entityList = entitySet.getEntities();
-			
-		// segmentCount == 2 means to get the entities for a specific session
-		// as "foreign key" is the sessionId used that all entities have
+
+			// segmentCount == 2 means to get the entities for a specific session
+			// as "foreign key" is the sessionId used that all entities have
 		} else if (segmentCount == 2) {
 			LOG.debug("Request for Collection of a specific Session: {}", request.getRawRequestUri());
 			UriResource lastSegment = resourcePaths.get(1);
