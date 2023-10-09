@@ -213,7 +213,7 @@ public class Storage {
 		return fileStream;
 	}
 
-	public InputStream readMedia(String filePath, long offset, long length) throws FileNotFoundException {
+	public InputStream readMedia(String filePath, long offset, long length) throws FileNotFoundException, ODataApplicationException {
 		RandomAccessFile randomAccessFile = new RandomAccessFile(filePath, "r");
 		byte[] buffer = new byte[(int) length];
 		try {
@@ -221,6 +221,9 @@ public class Storage {
 			randomAccessFile.readFully(buffer);
 		} catch (IOException e) {
 			LOG.error("Error reading {} and writing partially into buffer", filePath, e);
+			throw new ODataApplicationException("Error reading requested File" ,
+					HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
+					Locale.ENGLISH);
 		} finally {
 			try {
 				randomAccessFile.close();
