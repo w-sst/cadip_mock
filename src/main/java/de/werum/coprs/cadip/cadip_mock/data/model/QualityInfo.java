@@ -1,9 +1,13 @@
 package de.werum.coprs.cadip.cadip_mock.data.model;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public class QualityInfo {
 
+	private UUID sessionUUID;
+
+	// oData fields
 	private long channel;
 	private String sessionId;
 	private long acquiredTFs;
@@ -19,10 +23,12 @@ public class QualityInfo {
 	private long totalChunks;
 	private long totalVolume;
 
-	public QualityInfo(long channel, String sessionId, long acquiredTFs, long errorTFs, long correctedTFs,
-			long uncorrectableTFs, long dataTFs, long errorDataTFs, long correctedDataTFs, long uncorrectableDataTFs,
-			LocalDateTime deliveryStart, LocalDateTime deliveryStop, long totalChunks, long totalVolume) {
+	public QualityInfo(UUID sessionUUID, long channel, String sessionId, long acquiredTFs, long errorTFs,
+			long correctedTFs, long uncorrectableTFs, long dataTFs, long errorDataTFs, long correctedDataTFs,
+			long uncorrectableDataTFs, LocalDateTime deliveryStart, LocalDateTime deliveryStop, long totalChunks,
+			long totalVolume) {
 		super();
+		this.sessionUUID = sessionUUID;
 		this.channel = channel;
 		this.sessionId = sessionId;
 		this.acquiredTFs = acquiredTFs;
@@ -48,7 +54,7 @@ public class QualityInfo {
 				+ ", deliveryStop=" + deliveryStop + ", totalChunks=" + totalChunks + ", totalVolume=" + totalVolume
 				+ "]";
 	}
-	
+
 	public long getChannel() {
 		return channel;
 	}
@@ -103,5 +109,9 @@ public class QualityInfo {
 
 	public long getTotalVolume() {
 		return totalVolume;
+	}
+
+	public UUID getSessionUUID() {
+		return sessionUUID;
 	}
 }

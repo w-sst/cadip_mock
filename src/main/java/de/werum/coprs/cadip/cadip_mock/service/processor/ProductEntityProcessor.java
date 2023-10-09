@@ -78,8 +78,33 @@ public class ProductEntityProcessor implements EntityProcessor, MediaEntityProce
 
 		List<UriParameter> keyPredicates = uriResourceEntitySet.getKeyPredicates();
 		Entity entity = storage.readEntityData(edmEntitySet, keyPredicates);
-
+		
 		ExpandOption expandOption = uriInfo.getExpandOption();
+		expandFunction(expandOption, entity, edmEntitySet);
+
+		// convert entity to InputStream
+		EdmEntityType entityType = edmEntitySet.getEntityType();
+
+		String selectList = odata.createUriHelper().buildContextURLSelectList(entityType, expandOption, null);
+		ContextURL contextUrl = ContextURL.with().entitySet(edmEntitySet).selectList(selectList).suffix(Suffix.ENTITY)
+				.build();
+
+		EntitySerializerOptions serializerOptions = EntitySerializerOptions.with().contextURL(contextUrl)
+				.expand(expandOption).build();
+
+		ODataSerializer serializer = odata.createSerializer(responseFormat);
+		SerializerResult serializerResult = serializer.entity(serviceMetadata, entityType, entity, serializerOptions);
+		InputStream entityStream = serializerResult.getContent();
+
+		// set results as response
+		response.setContent(entityStream);
+		response.setStatusCode(HttpStatusCode.OK.getStatusCode());
+		response.setHeader(HttpHeader.CONTENT_TYPE, responseFormat.toContentTypeString());
+
+	}
+
+	public void expandFunction(ExpandOption expandOption, Entity entity, EdmEntitySet edmEntitySet)
+			throws ODataApplicationException {
 		if (expandOption != null) {
 			List<ExpandItem> expandItems = new ArrayList<ExpandItem>();
 			expandItems.addAll(expandOption.getExpandItems());
@@ -109,6 +134,7 @@ public class ProductEntityProcessor implements EntityProcessor, MediaEntityProce
 					Link link = new Link();
 					link.setTitle(navPropName);
 					link.setRel("TODO");
+					// At the moment there are only navigationProperties that are collections
 					if (edmNavigationProperty.isCollection()) {
 						EntityCollection expandEntityCollection = storage.getEntitiesForSession(entity,
 								expandEdmEntityType);
@@ -126,26 +152,6 @@ public class ProductEntityProcessor implements EntityProcessor, MediaEntityProce
 			}
 
 		}
-
-		// convert entity to InputStream
-		EdmEntityType entityType = edmEntitySet.getEntityType();
-
-		String selectList = odata.createUriHelper().buildContextURLSelectList(entityType, expandOption, null);
-		ContextURL contextUrl = ContextURL.with().entitySet(edmEntitySet).selectList(selectList).suffix(Suffix.ENTITY)
-				.build();
-
-		EntitySerializerOptions serializerOptions = EntitySerializerOptions.with().contextURL(contextUrl)
-				.expand(expandOption).build();
-
-		ODataSerializer serializer = odata.createSerializer(responseFormat);
-		SerializerResult serializerResult = serializer.entity(serviceMetadata, entityType, entity, serializerOptions);
-		InputStream entityStream = serializerResult.getContent();
-
-		// set results as response
-		response.setContent(entityStream);
-		response.setStatusCode(HttpStatusCode.OK.getStatusCode());
-		response.setHeader(HttpHeader.CONTENT_TYPE, responseFormat.toContentTypeString());
-
 	}
 
 	@Override

@@ -5,6 +5,9 @@ import java.util.UUID;
 
 public class Session {
 
+	private String sessionPath;
+
+	// oData fields
 	private UUID id;
 	private String sessionId;
 	private long numChannels; // 2
@@ -25,12 +28,13 @@ public class Session {
 	private boolean downlinkStatusOK; // Statisch true
 	private boolean deliveryPushOK; // Statisch true
 
-	public Session(UUID id, String sessionId, long numChannels, LocalDateTime publicationDate, String satellite,
-			String stationUnitId, long downlinkOrbit, String acquisitionId, String antennaId, String frontEndId,
-			boolean retransfer, boolean antennaStatusOK, boolean frontEndStatusOK, LocalDateTime plannedDataStart,
-			LocalDateTime plannedDataStop, LocalDateTime downlinkStart, LocalDateTime downlinkStop,
-			boolean downlinkStatusOK, boolean deliveryPushOK) {
+	public Session(String sessionPath, UUID id, String sessionId, long numChannels, LocalDateTime publicationDate,
+			String satellite, String stationUnitId, long downlinkOrbit, String acquisitionId, String antennaId,
+			String frontEndId, boolean retransfer, boolean antennaStatusOK, boolean frontEndStatusOK,
+			LocalDateTime plannedDataStart, LocalDateTime plannedDataStop, LocalDateTime downlinkStart,
+			LocalDateTime downlinkStop, boolean downlinkStatusOK, boolean deliveryPushOK) {
 		super();
+		this.sessionPath = sessionPath;
 		this.id = id;
 		this.sessionId = sessionId;
 		this.numChannels = numChannels;
@@ -61,6 +65,10 @@ public class Session {
 				+ ", frontEndStatusOK=" + frontEndStatusOK + ", plannedDataStart=" + plannedDataStart
 				+ ", plannedDataStop=" + plannedDataStop + ", downlinkStart=" + downlinkStart + ", downlinkStop="
 				+ downlinkStop + ", downlinkStatusOK=" + downlinkStatusOK + ", deliveryPushOK=" + deliveryPushOK + "]";
+	}
+
+	public String getSessionPath() {
+		return sessionPath;
 	}
 
 	public UUID getId() {

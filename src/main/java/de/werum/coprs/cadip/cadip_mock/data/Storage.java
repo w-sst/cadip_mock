@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,8 +47,6 @@ public class Storage {
 		qualityInfoList = new ArrayList<QualityInfo>();
 		filesList = new HashMap<>();
 	}
-
-	/* PUBLIC FACADE */
 
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -100,6 +100,11 @@ public class Storage {
 		return hasSession;
 	}
 
+	public Session getSessionForPath(String sessionPath) {
+		Optional<Session> session = sessionsList.stream().filter(o -> o.getSessionPath().equals(sessionPath)).findAny();
+		return session.isPresent() ? session.get() : null;
+	}
+
 	public void addSessionToList(Session sesison) {
 		sessionsList.add(sesison);
 	}
@@ -116,9 +121,13 @@ public class Storage {
 		return filesList.get(sessionId);
 	}
 
-	public File getFile(String UUID) {
+	public File getFile(String uuidAsString) {
+		return getFile(UUID.fromString(uuidAsString));
+	}
+
+	public File getFile(UUID uuid) {
 		for (Entry<String, Set<File>> t : filesList.entrySet()) {
-			Optional<File> optFile = t.getValue().stream().filter(o -> o.getId().toString().equals(UUID)).findAny();
+			Optional<File> optFile = t.getValue().stream().filter(o -> o.getId().equals(uuid)).findAny();
 			if (optFile.isPresent()) {
 				return optFile.get();
 			}
@@ -132,8 +141,10 @@ public class Storage {
 		EntityCollection entitySet = new EntityCollection();
 		List<Entity> entityList = entitySet.getEntities();
 		String sessionId = (String) sourceEntity.getProperty("SessionId").getValue();
+		UUID sessionUUID = (UUID) sourceEntity.getProperty("Id").getValue();
 		if (targetEntityType.getName().equals(EdmProvider.ET_FILE_NAME)) {
-			Set<File> fileSet = filesList.get(sessionId);
+			Set<File> fileSet = filesList.get(sessionId).stream().filter(o -> o.getSessionUUID().equals(sessionUUID))
+					.collect(Collectors.toSet());
 			if (fileSet == null) {
 				throw new ODataApplicationException("Found no Files for Session: " + sourceEntity,
 						HttpStatusCode.NOT_FOUND.getStatusCode(),
@@ -142,21 +153,20 @@ public class Storage {
 			entityList.addAll(MappingUtil.mapFileListToEntityList(fileSet));
 		} else if (targetEntityType.getName().equals(EdmProvider.ET_QUALITYINFO_NAME)) {
 			for (QualityInfo qualityInfo : qualityInfoList) {
-				if (qualityInfo.getSessionId().equals(sessionId)) {
+				if (qualityInfo.getSessionUUID().equals(sessionUUID)) {
 					entityList.add(MappingUtil.mapQualityInfoToEntity(qualityInfo));
 				}
 			}
-
 		}
 		return entitySet;
 	}
 
 	public Entity getEntityForSession(Entity sourceEntity, EdmEntityType targetEntityType)
 			throws ODataApplicationException {
-		String sessionId = (String) sourceEntity.getProperty("SessionId").getValue();
+		UUID sessionUUID = (UUID) sourceEntity.getProperty("Id").getValue();
 		if (targetEntityType.getName().equals(EdmProvider.ET_QUALITYINFO_NAME)) {
 			for (QualityInfo qualityInfo : qualityInfoList) {
-				if (qualityInfo.getSessionId().equals(sessionId)) {
+				if (qualityInfo.getSessionUUID().equals(sessionUUID)) {
 					return MappingUtil.mapQualityInfoToEntity(qualityInfo);
 				}
 			}

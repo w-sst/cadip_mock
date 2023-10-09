@@ -7,7 +7,9 @@ import java.util.UUID;
 public class File {
 
 	private String filePath;
-
+	private UUID sessionUUID;
+	
+	//oData fields
 	private UUID id;
 	private String name;
 	private String sessionId;
@@ -19,11 +21,12 @@ public class File {
 	private long size;
 	private boolean retransfer;
 
-	public File(String filePath, UUID id, String name, String sessionId, long channel, long blockNumber,
-			boolean finalBlock, LocalDateTime publicationDate, LocalDateTime evictionDate, long size,
+	public File(String filePath, UUID sessionUUID, UUID id, String name, String sessionId, long channel,
+			long blockNumber, boolean finalBlock, LocalDateTime publicationDate, LocalDateTime evictionDate, long size,
 			boolean retransfer) {
 		super();
 		this.filePath = filePath;
+		this.sessionUUID = sessionUUID;
 		this.id = id;
 		this.name = name;
 		this.sessionId = sessionId;
@@ -38,21 +41,11 @@ public class File {
 
 	@Override
 	public String toString() {
-		return "File [filePath=" + filePath + ", id=" + id + ", name=" + name + ", sessionId=" + sessionId
-				+ ", channel=" + channel + ", blockNumber=" + blockNumber + ", finalBlock=" + finalBlock
-				+ ", publicationDate=" + publicationDate + ", evictionDate=" + evictionDate + ", size=" + size
-				+ ", retransfer=" + retransfer + "]";
+		return "File [filePath=" + filePath + ", sessionUUID=" + sessionUUID + ", id=" + id + ", name=" + name
+				+ ", sessionId=" + sessionId + ", channel=" + channel + ", blockNumber=" + blockNumber + ", finalBlock="
+				+ finalBlock + ", publicationDate=" + publicationDate + ", evictionDate=" + evictionDate + ", size="
+				+ size + ", retransfer=" + retransfer + "]";
 	}
-
-	// @Override
-	// public int hashCode() {
-	// return Objects.hash(filePath);
-	// }
-	//
-	// @Override
-	// public boolean equals(Object obj) {
-	// return Objects.equals(filePath, obj);
-	// }
 
 	@Override
 	public int hashCode() {
@@ -121,7 +114,7 @@ public class File {
 		return filePath;
 	}
 
-	public void setFilePath(String filePath) {
-		this.filePath = filePath;
+	public UUID getSessionUUID() {
+		return sessionUUID;
 	}
 }

@@ -70,17 +70,18 @@ public class PollRun {
 
 	private void processSession(Path sessionPath, Matcher sessionMatcher) {
 		LOG.trace("Processing Session {}", sessionPath.getFileName().toString());
-		if (!storage.hasSession(sessionPath.getFileName().toString())) {
-			createSession(sessionPath, sessionMatcher);
+		Session currentSession;
+		if ((currentSession = storage.getSessionForPath(sessionPath.toString())) == null) {
+			currentSession = createSession(sessionPath, sessionMatcher);
 		}
 		Set<File> files = storage.getFileSet(sessionPath.getFileName().toString());
-		processFilesOfSession(files, sessionPath);
+		processFilesOfSession(files, sessionPath, currentSession.getId());
 	}
 
-	private void processFilesOfSession(Set<File> files, Path sessionPath) {
-		PathWalker fileWalker = new PathWalker(files);
+	private void processFilesOfSession(Set<File> files, Path sessionPath, UUID sessionUUID) {
+		PathWalker fileWalker = new PathWalker(files, sessionUUID);
 		try {
-			// There can be only one file, for each Channel, that is the finalBlock
+			// There can be only one file for each Channel, that is the finalBlock
 			files.forEach(o -> {
 				if (o.isFinalBlock()) {
 					o.setFinalBlock(false);
@@ -120,13 +121,14 @@ public class PollRun {
 	// });
 	// }
 
-	private void createSession(Path sessionPath, Matcher sessionMatcher) {
+	private Session createSession(Path sessionPath, Matcher sessionMatcher) {
 
 		storage.createFileSet(sessionPath.getFileName().toString());
 		LocalDateTime start = LocalDateTime.parse(sessionMatcher.group(3), dateTimeFormatter);
 		LocalDateTime stop = start.plusMinutes(16).plusSeconds(23);
 
-		Session newSession = new Session(UUID.randomUUID(),
+		Session newSession = new Session(sessionPath.toString(),
+				UUID.randomUUID(),
 				sessionPath.getFileName().toString(),
 				config.getNumChannels(),
 				LocalDateTime.now(),
@@ -147,7 +149,8 @@ public class PollRun {
 				config.isDeliveryPushOK());
 		Random rand = new Random();
 		for (long i = 1; i <= config.getNumChannels(); i++) {
-			QualityInfo newQualityInfo = new QualityInfo(i,
+			QualityInfo newQualityInfo = new QualityInfo(newSession.getId(),
+					i,
 					sessionPath.getFileName().toString(),
 					rand.nextLong(),
 					rand.nextLong(),
@@ -166,16 +169,19 @@ public class PollRun {
 		}
 		LOG.debug("added newSession: {}", newSession);
 		storage.addSessionToList(newSession);
+		return newSession;
 	}
 
 	private class PathWalker extends SimpleFileVisitor<Path> {
 
 		Pattern pattern;
 		Set<File> files;
+		UUID sessionUUID;
 
-		public PathWalker(Set<File> files) {
+		public PathWalker(Set<File> files, UUID sessionUUID) {
 			this.pattern = Pattern.compile("DCS_(\\d{2})_(.+_\\d+)_ch(\\d{1})_DSDB_(\\d{5}).raw");
 			this.files = files;
+			this.sessionUUID = sessionUUID;
 		}
 
 		@Override
@@ -185,6 +191,7 @@ public class PollRun {
 				Matcher matcher = pattern.matcher(file.getFileName().toString());
 				if (matcher.find()) {
 					File newFile = new File(file.toString(),
+							sessionUUID,
 							UUID.randomUUID(),
 							file.getFileName().toString(),
 							matcher.group(2),
