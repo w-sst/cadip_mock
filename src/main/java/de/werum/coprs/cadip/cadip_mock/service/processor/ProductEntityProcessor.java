@@ -186,7 +186,7 @@ public class ProductEntityProcessor implements EntityProcessor, MediaEntityProce
 						long length = Long.parseLong(t) - from + 1;
 						fileStream = storage.readMedia(file.getFilePath(), from, length);
 					} catch (NumberFormatException | IndexOutOfBoundsException | NegativeArraySizeException e) {
-						e.printStackTrace();
+						LOG.error("Error reading part of file", e);
 						throw new ODataApplicationException("Bad request",
 								HttpStatusCode.BAD_REQUEST.getStatusCode(),
 								Locale.ENGLISH);
