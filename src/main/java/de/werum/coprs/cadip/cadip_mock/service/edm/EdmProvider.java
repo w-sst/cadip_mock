@@ -163,9 +163,9 @@ public class EdmProvider extends CsdlAbstractEdmProvider {
 			CsdlProperty uncorrectableDataTFs = new CsdlProperty().setName("UncorrectableDataTFs")
 					.setType(EdmPrimitiveTypeKind.Int64.getFullQualifiedName());
 			CsdlProperty deliveryStart = new CsdlProperty().setName("DeliveryStart")
-					.setType(EdmPrimitiveTypeKind.DateTimeOffset.getFullQualifiedName());
+					.setType(EdmPrimitiveTypeKind.DateTimeOffset.getFullQualifiedName()).setPrecision(3);
 			CsdlProperty deliveryStop = new CsdlProperty().setName("DeliveryStop")
-					.setType(EdmPrimitiveTypeKind.DateTimeOffset.getFullQualifiedName());
+					.setType(EdmPrimitiveTypeKind.DateTimeOffset.getFullQualifiedName()).setPrecision(3);
 			CsdlProperty totalChunks = new CsdlProperty().setName("TotalChunks")
 					.setType(EdmPrimitiveTypeKind.Int64.getFullQualifiedName());
 			CsdlProperty totalVolume = new CsdlProperty().setName("TotalVolume")
