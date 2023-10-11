@@ -46,6 +46,13 @@ spec:
       subdomain: {{ .Release.Name }}-svc
       securityContext: {}
       schedulerName: default-scheduler
+      volumes:
+        - name: logging-config-volume
+          configMap:
+            name: {{ .Release.Name }}-logging-config
+        - name: service-config-volume
+          configMap:
+            name: {{ .Release.Name }}-service-config
   serviceName: {{ .Release.Name }}-svc
   revisionHistoryLimit: 10
   volumeClaimTemplates:  

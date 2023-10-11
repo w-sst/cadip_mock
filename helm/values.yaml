@@ -6,21 +6,12 @@ image:
   tag: latest
   imagePullSecrets: ghcr-w-fsi
 
-
-#podAnnotations: {}
-
-#podSecurityContext: {}
-  # fsGroup: 2000
-
-#securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
+logLevel: DEBUG
+logConfig: log/log4j2_debug.yml
 
 service:
+  name: cadip_mock
+  address: 0.0.0.0
   port: 8080
 
 processing:
@@ -38,9 +29,35 @@ resources:
      cpu: 100m
      memory: 315Mi
 
-
-#nodeSelector: {}
-
-#tolerations: []
-
-#affinity: {}
+cadip:
+  trigger:
+    intervalms: 120000
+  inboxes:
+    '1':
+      path: /mnt/net/esaeo/pro/1413.30_s1pro-cloud/testdata/sessions/S1A
+      retransfer: false
+      stationUnitId: 123stationUnitId321
+      acquisitionId: 54321
+      antennaId: 54322
+      frontEndId: 54323
+    '2':
+      path: /home/simon_steckelberg/workspace/test2
+      retransfer: true
+      stationUnitId: 123stationUnitId321
+      acquisitionId: 54321
+      antennaId: 54322
+      frontEndId: 54323
+    '3':
+      path: /home/simon_steckelberg/workspace/test
+      retransfer: false
+      stationUnitId: 123stationUnitId321
+      acquisitionId: 54321
+      antennaId: 54322
+      frontEndId: 54323
+    '4':
+      path: /home/simon_steckelberg/workspace/test3
+      retransfer: true
+      stationUnitId: 123stationUnitId321
+      acquisitionId: 54321
+      antennaId: 54322
+      frontEndId: 54323

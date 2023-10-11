@@ -1,0 +1,17 @@
+spring:
+  main:
+    banner-mode: "off"
+  application:
+    name: {{ .Values.service.name }}
+
+cadip:
+  inboxes: {{ toYaml  .Values.cadip.inboxes | nindent 4 }}
+  trigger:
+    interval-ms: {{ .Values.cadip.trigger.intervalms }}
+
+logging:
+  config: {{ .Values.logConfig }}
+
+server:
+  address: {{ .Values.service.address }}
+  port: {{ .Values.service.port }}
