@@ -58,37 +58,37 @@ public class TestOdataController {
 		JsonNode newFiles = newResponse.findValue("value");
 		assertThat(files.get(1)).isEqualTo(newFiles.get(0));
 		assertThat(newFiles.size()).isEqualTo(newSize);
-		assertThat(newResponse.findValue("@odata.count").asInt()).isEqualTo(response.findValue("@odata.count").asInt() - 2);
+		assertThat(newResponse.findValue("@odata.count").asInt())
+				.isEqualTo(response.findValue("@odata.count").asInt() - 2);
 	}
-	
+
 	@Test
 	public void testQueryFunctionOrderBy() throws Exception {
 		// By default its ordered by PublicationDate ascending
-		MvcResult f = this.mockMvc.perform(get("/odata/v1/Files").contentType(MediaType.APPLICATION_JSON))
-				.andReturn();
+		MvcResult f = this.mockMvc.perform(get("/odata/v1/Files").contentType(MediaType.APPLICATION_JSON)).andReturn();
 		JsonNode response = toJsonNode(f);
 		JsonNode file = response.findValue("value").get(0);
-		
-		MvcResult f2 = this.mockMvc.perform(
-				get("/odata/v1/Files?$orderby=PublicationDate desc").contentType(MediaType.APPLICATION_JSON))
+
+		MvcResult f2 = this.mockMvc
+				.perform(get("/odata/v1/Files?$orderby=PublicationDate desc").contentType(MediaType.APPLICATION_JSON))
 				.andReturn();
 		JsonNode newResponse = toJsonNode(f2);
 		JsonNode newFiles = newResponse.findValue("value");
-		assertThat(file).isEqualTo(newFiles.get(newFiles.size()-1));
+		assertThat(file).isEqualTo(newFiles.get(newFiles.size() - 1));
 	}
-	
+
 	@Test
 	public void testQueryFunctionFilter() throws Exception {
-		MvcResult f = this.mockMvc.perform(get("/odata/v1/Files").contentType(MediaType.APPLICATION_JSON))
-				.andReturn();
+		MvcResult f = this.mockMvc.perform(get("/odata/v1/Files").contentType(MediaType.APPLICATION_JSON)).andReturn();
 		JsonNode response = toJsonNode(f);
 		JsonNode files = response.findValue("value");
-		JsonNode mid = files.get((int) Math.floor(files.size()/2));
+		JsonNode mid = files.get((int) Math.floor(files.size() / 2));
 		String blockNumber = mid.get("BlockNumber").asText();
 		String channel = mid.get("Channel").asText();
-		
-		MvcResult f2 = this.mockMvc.perform(
-				get("/odata/v1/Files?$filter=BlockNumber eq "+blockNumber+" and Channel eq "+channel).contentType(MediaType.APPLICATION_JSON))
+
+		MvcResult f2 = this.mockMvc
+				.perform(get("/odata/v1/Files?$filter=BlockNumber eq " + blockNumber + " and Channel eq " + channel)
+						.contentType(MediaType.APPLICATION_JSON))
 				.andReturn();
 		JsonNode newResponse = toJsonNode(f2);
 		JsonNode newFiles = newResponse.findValue("value");
