@@ -34,29 +34,8 @@ cadip:
     intervalms: 120000
   inboxes:
     '1':
-      path: /mnt/net/esaeo/pro/1413.30_s1pro-cloud/testdata/sessions/S1A
+      path: /data
       retransfer: false
-      stationUnitId: 123stationUnitId321
-      acquisitionId: 54321
-      antennaId: 54322
-      frontEndId: 54323
-    '2':
-      path: /home/simon_steckelberg/workspace/test2
-      retransfer: true
-      stationUnitId: 123stationUnitId321
-      acquisitionId: 54321
-      antennaId: 54322
-      frontEndId: 54323
-    '3':
-      path: /home/simon_steckelberg/workspace/test
-      retransfer: false
-      stationUnitId: 123stationUnitId321
-      acquisitionId: 54321
-      antennaId: 54322
-      frontEndId: 54323
-    '4':
-      path: /home/simon_steckelberg/workspace/test3
-      retransfer: true
       stationUnitId: 123stationUnitId321
       acquisitionId: 54321
       antennaId: 54322
