@@ -39,6 +39,7 @@ Configuration:
         additivity: false
         AppenderRef:
           - ref: STDOUT
+          - ref: PLAIN
           - ref: FILE
       - name: org.springframework
         level: ERROR
