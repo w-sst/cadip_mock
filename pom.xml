@@ -15,7 +15,7 @@
 		<spring.boot.version>2.6.6</spring.boot.version>
 		<javavintage.version>5.8.2</javavintage.version>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
-	    	<maven.compiler.source>${java.version}</maven.compiler.source>
+	    <maven.compiler.source>${java.version}</maven.compiler.source>
 	</properties>
 	
 	<dependencies>
@@ -23,6 +23,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
 			<version>${spring.boot.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
