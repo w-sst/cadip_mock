@@ -31,6 +31,10 @@ spec:
         volumeMounts: 
         - name: cadipdatadir
           mountPath: /data
+        - name: service-config-volume
+          mountPath: /app/config
+        - name: logging-config-volume
+          mountPath: /app/log
         livenessProbe:
           tcpSocket:
             port: 8080
