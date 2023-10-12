@@ -13,8 +13,9 @@
 		<java.version>11</java.version>
 		<odata.version>4.8.0</odata.version>
 		<spring.boot.version>2.6.6</spring.boot.version>
+		<javavintage.version>5.8.2</javavintage.version>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
-    	<maven.compiler.source>${java.version}</maven.compiler.source>
+	    	<maven.compiler.source>${java.version}</maven.compiler.source>
 	</properties>
 	
 	<dependencies>
@@ -66,6 +67,13 @@
 		 <artifactId>spring-boot-configuration-processor</artifactId>
 		 <optional>true</optional>
 		 <version>${spring.boot.version}</version>
+	 </dependency>
+
+		<dependency>
+			<groupId>org.junit.vintage</groupId>
+			<artifactId>junit-vintage-engine</artifactId>
+			<scope>test</scope>
+			<version>${javavintage.version}</version>
 		</dependency>
 	</dependencies>
 

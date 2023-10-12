@@ -248,8 +248,6 @@ public class ProductEntityCollectionProcessor implements EntityCollectionProcess
 
 		Collections.sort(entityList, new Comparator<Entity>() {
 			public int compare(Entity entity1, Entity entity2) {
-				int compareResult = 0;
-
 				Object left = entity1.getProperty(sortPropertyName).getValue();
 				Object right = entity2.getProperty(sortPropertyName).getValue();
 				int result = 0;
@@ -277,7 +275,7 @@ public class ProductEntityCollectionProcessor implements EntityCollectionProcess
 					return -result;
 				}
 
-				return compareResult;
+				return result;
 			}
 		});
 	}
