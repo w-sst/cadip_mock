@@ -75,6 +75,10 @@ public class PollRun {
 			currentSession = createSession(sessionPath, sessionMatcher);
 		}
 		Set<File> files = storage.getFileSet(sessionPath.getFileName().toString());
+		if (files == null) {
+			storage.createFileSet(sessionPath.getFileName().toString());
+			files = storage.getFileSet(sessionPath.getFileName().toString());
+		}
 		processFilesOfSession(files, sessionPath, currentSession.getId());
 	}
 
@@ -123,7 +127,6 @@ public class PollRun {
 
 	private Session createSession(Path sessionPath, Matcher sessionMatcher) {
 
-		storage.createFileSet(sessionPath.getFileName().toString());
 		LocalDateTime start = LocalDateTime.parse(sessionMatcher.group(3), dateTimeFormatter);
 		LocalDateTime stop = start.plusMinutes(16).plusSeconds(23);
 

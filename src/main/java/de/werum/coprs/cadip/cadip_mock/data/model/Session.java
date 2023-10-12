@@ -58,13 +58,14 @@ public class Session {
 
 	@Override
 	public String toString() {
-		return "Session [id=" + id + ", sessionId=" + sessionId + ", numChannels=" + numChannels + ", publicationDate="
-				+ publicationDate + ", satellite=" + satellite + ", stationUnitId=" + stationUnitId + ", downlinkOrbit="
-				+ downlinkOrbit + ", acquisitionId=" + acquisitionId + ", antennaId=" + antennaId + ", frontEndId="
-				+ frontEndId + ", retransfer=" + retransfer + ", antennaStatusOK=" + antennaStatusOK
-				+ ", frontEndStatusOK=" + frontEndStatusOK + ", plannedDataStart=" + plannedDataStart
-				+ ", plannedDataStop=" + plannedDataStop + ", downlinkStart=" + downlinkStart + ", downlinkStop="
-				+ downlinkStop + ", downlinkStatusOK=" + downlinkStatusOK + ", deliveryPushOK=" + deliveryPushOK + "]";
+		return "Session [sessionPath=" + sessionPath + ", id=" + id + ", sessionId=" + sessionId + ", numChannels="
+				+ numChannels + ", publicationDate=" + publicationDate + ", satellite=" + satellite + ", stationUnitId="
+				+ stationUnitId + ", downlinkOrbit=" + downlinkOrbit + ", acquisitionId=" + acquisitionId
+				+ ", antennaId=" + antennaId + ", frontEndId=" + frontEndId + ", retransfer=" + retransfer
+				+ ", antennaStatusOK=" + antennaStatusOK + ", frontEndStatusOK=" + frontEndStatusOK
+				+ ", plannedDataStart=" + plannedDataStart + ", plannedDataStop=" + plannedDataStop + ", downlinkStart="
+				+ downlinkStart + ", downlinkStop=" + downlinkStop + ", downlinkStatusOK=" + downlinkStatusOK
+				+ ", deliveryPushOK=" + deliveryPushOK + "]";
 	}
 
 	public String getSessionPath() {

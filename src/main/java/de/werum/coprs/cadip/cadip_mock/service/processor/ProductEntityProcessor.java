@@ -109,9 +109,8 @@ public class ProductEntityProcessor implements EntityProcessor, MediaEntityProce
 			List<ExpandItem> expandItems = new ArrayList<ExpandItem>();
 			expandItems.addAll(expandOption.getExpandItems());
 
-			ExpandItem expandItem = expandOption.getExpandItems().get(0);
 			List<EdmNavigationProperty> edmNavigationProperties = new ArrayList<EdmNavigationProperty>();
-			if (expandItem.isStar()) {
+			if (expandItems.get(0).isStar()) {
 				List<EdmNavigationPropertyBinding> bindings = edmEntitySet.getNavigationPropertyBindings();
 				for (EdmNavigationPropertyBinding binding : bindings) {
 					EdmElement property = edmEntitySet.getEntityType().getProperty(binding.getPath());
@@ -120,9 +119,11 @@ public class ProductEntityProcessor implements EntityProcessor, MediaEntityProce
 					}
 				}
 			} else {
-				UriResource expandUriResource = expandItem.getResourcePath().getUriResourceParts().get(0);
-				if (expandUriResource instanceof UriResourceNavigation) {
-					edmNavigationProperties.add(((UriResourceNavigation) expandUriResource).getProperty());
+				for (ExpandItem expandItem : expandItems) {
+					UriResource expandUriResource = expandItem.getResourcePath().getUriResourceParts().get(0);
+					if (expandUriResource instanceof UriResourceNavigation) {
+						edmNavigationProperties.add(((UriResourceNavigation) expandUriResource).getProperty());
+					}
 				}
 			}
 
