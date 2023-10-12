@@ -34,7 +34,7 @@ Configuration:
           max: 30
   Loggers:
     logger:
-      - name: de.werum.coprs
+      - name: de.werum.coprs.cadip.cadip_mock
         level: DEBUG
         additivity: false
         AppenderRef:
