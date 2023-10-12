@@ -1,0 +1,32 @@
+cadip:
+  inboxes:
+    '2':
+      path: ./src/test/resources/data/test2
+      retransfer: true
+      stationUnitId: 123stationUnitId321
+      acquisitionId: 54321
+      antennaId: 54322
+      frontEndId: 54323
+    '3':
+      path: ./src/test/resources/data/test
+      retransfer: false
+      stationUnitId: 123stationUnitId321
+      acquisitionId: 54321
+      antennaId: 54322
+      frontEndId: 54323
+    '4':
+      path: ./src/test/resources/data/test3
+      retransfer: true
+      stationUnitId: 123stationUnitId321
+      acquisitionId: 54321
+      antennaId: 54322
+      frontEndId: 54323
+  trigger:
+    interval-ms: 120000
+
+logging.level.de.werum.coprs.cadip.cadip_mock: DEBUG
+
+server:
+  address: 0.0.0.0
+  port: 8080
+
