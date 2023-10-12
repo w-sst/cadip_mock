@@ -31,6 +31,8 @@ spec:
         volumeMounts: 
         - name: cadipdatadir
           mountPath: /data
+        - name: cadipdatadir2
+          mountPath: /data_retransfer
         - name: service-config-volume
           mountPath: /app/config
         - name: logging-config-volume
@@ -62,6 +64,14 @@ spec:
   volumeClaimTemplates:  
   - metadata:
       name: cadipdatadir
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: "30Gi"
+  - metadata:
+      name: cadipdatadir2
     spec:
       accessModes:
       - ReadWriteOnce
