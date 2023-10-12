@@ -9,8 +9,10 @@ cadip:
   trigger:
     interval-ms: {{ .Values.cadip.trigger.intervalms }}
 
-logging:
-  config: {{ .Values.logConfig }}
+# TODO: Fix logging config 
+# logging:
+#   config: {{ .Values.logConfig }}
+logging.level.de.werum.coprs.cadip.cadip_mock: DEBUG
 
 server:
   address: {{ .Values.service.address }}

@@ -6,8 +6,8 @@ image:
   tag: latest
   imagePullSecrets: ghcr-w-fsi
 
-logLevel: DEBUG
-logConfig: log/log4j2_debug.yml
+# logLevel: DEBUG
+# logConfig: log/log4j2_debug.yml
 
 service:
   name: cadip_mock
