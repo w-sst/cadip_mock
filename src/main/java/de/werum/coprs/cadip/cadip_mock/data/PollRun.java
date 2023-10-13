@@ -79,6 +79,7 @@ public class PollRun {
 			storage.createFileSet(sessionPath.getFileName().toString());
 			files = storage.getFileSet(sessionPath.getFileName().toString());
 		}
+		
 		processFilesOfSession(files, sessionPath, currentSession.getId());
 	}
 
@@ -87,7 +88,7 @@ public class PollRun {
 		try {
 			// There can be only one file for each Channel, that is the finalBlock
 			files.forEach(o -> {
-				if (o.isFinalBlock()) {
+				if (o.isFinalBlock() && o.getFilePath().startsWith(sessionPath.toString())) {
 					o.setFinalBlock(false);
 				}
 			});
@@ -95,7 +96,7 @@ public class PollRun {
 			Files.walkFileTree(sessionPath, fileWalker);
 
 			for (long i = 1L; i <= config.getNumChannels(); i++) {
-				setFinalFileOfChannel(files, i);
+				setFinalFileOfChannel(files, sessionPath.toString(), i);
 			}
 		} catch (IOException e) {
 			LOG.error(e);
@@ -104,8 +105,8 @@ public class PollRun {
 
 	// Filters files after their channel and gets the file obj with the highest
 	// BlockNumber and sets their finalBlock=true
-	private void setFinalFileOfChannel(Set<File> files, long channel) {
-		Optional<File> finalFile = files.stream().filter(o -> o.getChannel() == channel)
+	private void setFinalFileOfChannel(Set<File> files, String sessionPath, long channel) {
+		Optional<File> finalFile = files.stream().filter(o -> o.getChannel() == channel && o.getFilePath().startsWith(sessionPath))
 				.reduce((first, second) -> first.getBlockNumber() > second.getBlockNumber() ? first : second);
 		if (finalFile.isPresent()) {
 			finalFile.get().setFinalBlock(true);
