@@ -11,6 +11,7 @@ import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.edm.EdmEnumType;
 import org.apache.olingo.commons.api.edm.EdmType;
 import org.apache.olingo.commons.api.http.HttpStatusCode;
+import org.apache.olingo.commons.core.edm.primitivetype.EdmBoolean;
 import org.apache.olingo.commons.core.edm.primitivetype.EdmDateTimeOffset;
 import org.apache.olingo.commons.core.edm.primitivetype.EdmGuid;
 import org.apache.olingo.commons.core.edm.primitivetype.EdmString;
@@ -269,12 +270,14 @@ public class FilterExpressionVisitor implements ExpressionVisitor<Object> {
 			return TimeUtil.convertStringToTimestamp(literalAsString);
 		} else if (literal.getType() instanceof EdmGuid) {
 			return UUID.fromString(literalAsString);
+		} else if (literal.getType() instanceof EdmBoolean) {
+			return Boolean.valueOf(literalAsString);
 		} else {
 			try {
 				return Long.parseLong(literalAsString);
 			} catch (NumberFormatException e) {
 				throw new ODataApplicationException(
-						"Only Edm.Int64, Edm.String, Edm.DateTimeOffset, Edm.Guid literals are implemented",
+						"Only Edm.Int64, Edm.String, Edm.Boolean, Edm.DateTimeOffset, Edm.Guid literals are implemented",
 						HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(),
 						Locale.ENGLISH);
 			}
